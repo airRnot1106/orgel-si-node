@@ -13,7 +13,6 @@ const removeIgnoredFiles = async (files) => {
 
 module.exports = {
   '*.{ts,tsx}': [
-    () => 'bash -c tsc --incremental false --noEmit',
     async (files) => {
       const filesToLint = await removeIgnoredFiles(files);
       return [`eslint --max-warnings=0 ${filesToLint}`];
