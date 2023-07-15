@@ -4,7 +4,11 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsx scripts/build.ts production",
     "build:dev": "tsx scripts/build.ts development",
-    "test": "DATABASE_URL='postgresql://postgres:postgres@localhost:5432/postgres?schema=test' jest --verbose false --watchAll"
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:generate": "prisma generate",
+    "prisma:reset": "prisma migrate reset --force",
+    "prisma:studio": "prisma studio",
+    "test": "DATABASE_URL='postgresql://postgres:postgres@localhost:5432/postgres?schema=test' jest --verbose false --watchAll",
     "prepare": "husky install"
   },
   "dependencies": {
