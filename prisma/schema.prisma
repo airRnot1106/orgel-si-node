@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator zod {
+  provider                  = "pnpm dlx zod-prisma-types"
+  output                    = "../src/schema/generated/prisma"
+  createRelationValuesTypes = true
+}
+
+generator fabbrica {
+  provider = "prisma-fabbrica"
+  output   = "../src/fabbrica"
+  tsconfig = "../tsconfig.json"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Guild {
+  id      String   @id
+  name    String
+  Setting Setting?
+
+  @@map("guilds")
+}
+
+enum Language {
+  en
+  ja
+}
+
+model Setting {
+  id       String   @id
+  guild    Guild    @relation(fields: [id], references: [id])
+  language Language
+
+  @@map("settings")
+}

@@ -4,6 +4,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsx scripts/build.ts production",
     "build:dev": "tsx scripts/build.ts development",
+    "lint": "eslint --ext .ts,.tsx src",
+    "format": "prettier --write .",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
     "prisma:reset": "prisma migrate reset --force",

@@ -18,5 +18,6 @@
     "skipLibCheck": true,
     "types": ["@types/jest", "@quramy/jest-prisma-node"]
   },
-  "include": ["src/**/*", "__tests__/**/*", "scripts/**/*"]
+  "include": ["src/**/*", "__tests__/**/*", "scripts/**/*"],
+  "exclude": ["node_modules", "dist", "scripts", "**/generated", "**/fabbrica"]
 }
