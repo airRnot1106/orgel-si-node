@@ -165,7 +165,7 @@ export const GuildWhereInputSchema: z.ZodType<Prisma.GuildWhereInput> = z
     name: z.union([z.lazy(() => StringFilterSchema), z.string()]).optional(),
     Setting: z
       .union([
-        z.lazy(() => SettingRelationFilterSchema),
+        z.lazy(() => SettingNullableRelationFilterSchema),
         z.lazy(() => SettingWhereInputSchema),
       ])
       .optional()
@@ -185,9 +185,41 @@ export const GuildOrderByWithRelationInputSchema: z.ZodType<Prisma.GuildOrderByW
 export const GuildWhereUniqueInputSchema: z.ZodType<Prisma.GuildWhereUniqueInput> =
   z
     .object({
-      id: z.string().optional(),
+      id: z.string(),
     })
-    .strict();
+    .and(
+      z
+        .object({
+          id: z.string().optional(),
+          AND: z
+            .union([
+              z.lazy(() => GuildWhereInputSchema),
+              z.lazy(() => GuildWhereInputSchema).array(),
+            ])
+            .optional(),
+          OR: z
+            .lazy(() => GuildWhereInputSchema)
+            .array()
+            .optional(),
+          NOT: z
+            .union([
+              z.lazy(() => GuildWhereInputSchema),
+              z.lazy(() => GuildWhereInputSchema).array(),
+            ])
+            .optional(),
+          name: z
+            .union([z.lazy(() => StringFilterSchema), z.string()])
+            .optional(),
+          Setting: z
+            .union([
+              z.lazy(() => SettingNullableRelationFilterSchema),
+              z.lazy(() => SettingWhereInputSchema),
+            ])
+            .optional()
+            .nullable(),
+        })
+        .strict()
+    );
 
 export const GuildOrderByWithAggregationInputSchema: z.ZodType<Prisma.GuildOrderByWithAggregationInput> =
   z
@@ -274,9 +306,43 @@ export const SettingOrderByWithRelationInputSchema: z.ZodType<Prisma.SettingOrde
 export const SettingWhereUniqueInputSchema: z.ZodType<Prisma.SettingWhereUniqueInput> =
   z
     .object({
-      id: z.string().optional(),
+      id: z.string(),
     })
-    .strict();
+    .and(
+      z
+        .object({
+          id: z.string().optional(),
+          AND: z
+            .union([
+              z.lazy(() => SettingWhereInputSchema),
+              z.lazy(() => SettingWhereInputSchema).array(),
+            ])
+            .optional(),
+          OR: z
+            .lazy(() => SettingWhereInputSchema)
+            .array()
+            .optional(),
+          NOT: z
+            .union([
+              z.lazy(() => SettingWhereInputSchema),
+              z.lazy(() => SettingWhereInputSchema).array(),
+            ])
+            .optional(),
+          language: z
+            .union([
+              z.lazy(() => EnumLanguageFilterSchema),
+              z.lazy(() => LanguageSchema),
+            ])
+            .optional(),
+          guild: z
+            .union([
+              z.lazy(() => GuildRelationFilterSchema),
+              z.lazy(() => GuildWhereInputSchema),
+            ])
+            .optional(),
+        })
+        .strict()
+    );
 
 export const SettingOrderByWithAggregationInputSchema: z.ZodType<Prisma.SettingOrderByWithAggregationInput> =
   z
@@ -507,16 +573,36 @@ export const SettingUncheckedUpdateManyInputSchema: z.ZodType<Prisma.SettingUnch
 
 export const StringFilterSchema: z.ZodType<Prisma.StringFilter> = z
   .object({
-    equals: z.string().optional(),
-    in: z.union([z.string().array(), z.string()]).optional(),
-    notIn: z.union([z.string().array(), z.string()]).optional(),
-    lt: z.string().optional(),
-    lte: z.string().optional(),
-    gt: z.string().optional(),
-    gte: z.string().optional(),
-    contains: z.string().optional(),
-    startsWith: z.string().optional(),
-    endsWith: z.string().optional(),
+    equals: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    in: z
+      .union([z.string().array(), z.lazy(() => ListStringFieldRefInputSchema)])
+      .optional(),
+    notIn: z
+      .union([z.string().array(), z.lazy(() => ListStringFieldRefInputSchema)])
+      .optional(),
+    lt: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    lte: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    gt: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    gte: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    contains: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    startsWith: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    endsWith: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
     mode: z.lazy(() => QueryModeSchema).optional(),
     not: z
       .union([z.string(), z.lazy(() => NestedStringFilterSchema)])
@@ -524,7 +610,7 @@ export const StringFilterSchema: z.ZodType<Prisma.StringFilter> = z
   })
   .strict();
 
-export const SettingRelationFilterSchema: z.ZodType<Prisma.SettingRelationFilter> =
+export const SettingNullableRelationFilterSchema: z.ZodType<Prisma.SettingNullableRelationFilter> =
   z
     .object({
       is: z
@@ -565,16 +651,42 @@ export const GuildMinOrderByAggregateInputSchema: z.ZodType<Prisma.GuildMinOrder
 export const StringWithAggregatesFilterSchema: z.ZodType<Prisma.StringWithAggregatesFilter> =
   z
     .object({
-      equals: z.string().optional(),
-      in: z.union([z.string().array(), z.string()]).optional(),
-      notIn: z.union([z.string().array(), z.string()]).optional(),
-      lt: z.string().optional(),
-      lte: z.string().optional(),
-      gt: z.string().optional(),
-      gte: z.string().optional(),
-      contains: z.string().optional(),
-      startsWith: z.string().optional(),
-      endsWith: z.string().optional(),
+      equals: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      in: z
+        .union([
+          z.string().array(),
+          z.lazy(() => ListStringFieldRefInputSchema),
+        ])
+        .optional(),
+      notIn: z
+        .union([
+          z.string().array(),
+          z.lazy(() => ListStringFieldRefInputSchema),
+        ])
+        .optional(),
+      lt: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      lte: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      gt: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      gte: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      contains: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      startsWith: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      endsWith: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
       mode: z.lazy(() => QueryModeSchema).optional(),
       not: z
         .union([
@@ -590,17 +702,22 @@ export const StringWithAggregatesFilterSchema: z.ZodType<Prisma.StringWithAggreg
 
 export const EnumLanguageFilterSchema: z.ZodType<Prisma.EnumLanguageFilter> = z
   .object({
-    equals: z.lazy(() => LanguageSchema).optional(),
+    equals: z
+      .union([
+        z.lazy(() => LanguageSchema),
+        z.lazy(() => EnumLanguageFieldRefInputSchema),
+      ])
+      .optional(),
     in: z
       .union([
         z.lazy(() => LanguageSchema).array(),
-        z.lazy(() => LanguageSchema),
+        z.lazy(() => ListEnumLanguageFieldRefInputSchema),
       ])
       .optional(),
     notIn: z
       .union([
         z.lazy(() => LanguageSchema).array(),
-        z.lazy(() => LanguageSchema),
+        z.lazy(() => ListEnumLanguageFieldRefInputSchema),
       ])
       .optional(),
     not: z
@@ -615,14 +732,8 @@ export const EnumLanguageFilterSchema: z.ZodType<Prisma.EnumLanguageFilter> = z
 export const GuildRelationFilterSchema: z.ZodType<Prisma.GuildRelationFilter> =
   z
     .object({
-      is: z
-        .lazy(() => GuildWhereInputSchema)
-        .optional()
-        .nullable(),
-      isNot: z
-        .lazy(() => GuildWhereInputSchema)
-        .optional()
-        .nullable(),
+      is: z.lazy(() => GuildWhereInputSchema).optional(),
+      isNot: z.lazy(() => GuildWhereInputSchema).optional(),
     })
     .strict();
 
@@ -653,17 +764,22 @@ export const SettingMinOrderByAggregateInputSchema: z.ZodType<Prisma.SettingMinO
 export const EnumLanguageWithAggregatesFilterSchema: z.ZodType<Prisma.EnumLanguageWithAggregatesFilter> =
   z
     .object({
-      equals: z.lazy(() => LanguageSchema).optional(),
+      equals: z
+        .union([
+          z.lazy(() => LanguageSchema),
+          z.lazy(() => EnumLanguageFieldRefInputSchema),
+        ])
+        .optional(),
       in: z
         .union([
           z.lazy(() => LanguageSchema).array(),
-          z.lazy(() => LanguageSchema),
+          z.lazy(() => ListEnumLanguageFieldRefInputSchema),
         ])
         .optional(),
       notIn: z
         .union([
           z.lazy(() => LanguageSchema).array(),
-          z.lazy(() => LanguageSchema),
+          z.lazy(() => ListEnumLanguageFieldRefInputSchema),
         ])
         .optional(),
       not: z
@@ -730,11 +846,16 @@ export const SettingUpdateOneWithoutGuildNestedInputSchema: z.ZodType<Prisma.Set
         .lazy(() => SettingCreateOrConnectWithoutGuildInputSchema)
         .optional(),
       upsert: z.lazy(() => SettingUpsertWithoutGuildInputSchema).optional(),
-      disconnect: z.boolean().optional(),
-      delete: z.boolean().optional(),
+      disconnect: z
+        .union([z.boolean(), z.lazy(() => SettingWhereInputSchema)])
+        .optional(),
+      delete: z
+        .union([z.boolean(), z.lazy(() => SettingWhereInputSchema)])
+        .optional(),
       connect: z.lazy(() => SettingWhereUniqueInputSchema).optional(),
       update: z
         .union([
+          z.lazy(() => SettingUpdateToOneWithWhereWithoutGuildInputSchema),
           z.lazy(() => SettingUpdateWithoutGuildInputSchema),
           z.lazy(() => SettingUncheckedUpdateWithoutGuildInputSchema),
         ])
@@ -755,11 +876,16 @@ export const SettingUncheckedUpdateOneWithoutGuildNestedInputSchema: z.ZodType<P
         .lazy(() => SettingCreateOrConnectWithoutGuildInputSchema)
         .optional(),
       upsert: z.lazy(() => SettingUpsertWithoutGuildInputSchema).optional(),
-      disconnect: z.boolean().optional(),
-      delete: z.boolean().optional(),
+      disconnect: z
+        .union([z.boolean(), z.lazy(() => SettingWhereInputSchema)])
+        .optional(),
+      delete: z
+        .union([z.boolean(), z.lazy(() => SettingWhereInputSchema)])
+        .optional(),
       connect: z.lazy(() => SettingWhereUniqueInputSchema).optional(),
       update: z
         .union([
+          z.lazy(() => SettingUpdateToOneWithWhereWithoutGuildInputSchema),
           z.lazy(() => SettingUpdateWithoutGuildInputSchema),
           z.lazy(() => SettingUncheckedUpdateWithoutGuildInputSchema),
         ])
@@ -806,6 +932,7 @@ export const GuildUpdateOneRequiredWithoutSettingNestedInputSchema: z.ZodType<Pr
       connect: z.lazy(() => GuildWhereUniqueInputSchema).optional(),
       update: z
         .union([
+          z.lazy(() => GuildUpdateToOneWithWhereWithoutSettingInputSchema),
           z.lazy(() => GuildUpdateWithoutSettingInputSchema),
           z.lazy(() => GuildUncheckedUpdateWithoutSettingInputSchema),
         ])
@@ -815,16 +942,36 @@ export const GuildUpdateOneRequiredWithoutSettingNestedInputSchema: z.ZodType<Pr
 
 export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z
   .object({
-    equals: z.string().optional(),
-    in: z.union([z.string().array(), z.string()]).optional(),
-    notIn: z.union([z.string().array(), z.string()]).optional(),
-    lt: z.string().optional(),
-    lte: z.string().optional(),
-    gt: z.string().optional(),
-    gte: z.string().optional(),
-    contains: z.string().optional(),
-    startsWith: z.string().optional(),
-    endsWith: z.string().optional(),
+    equals: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    in: z
+      .union([z.string().array(), z.lazy(() => ListStringFieldRefInputSchema)])
+      .optional(),
+    notIn: z
+      .union([z.string().array(), z.lazy(() => ListStringFieldRefInputSchema)])
+      .optional(),
+    lt: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    lte: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    gt: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    gte: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    contains: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    startsWith: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
+    endsWith: z
+      .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+      .optional(),
     not: z
       .union([z.string(), z.lazy(() => NestedStringFilterSchema)])
       .optional(),
@@ -834,16 +981,42 @@ export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z
 export const NestedStringWithAggregatesFilterSchema: z.ZodType<Prisma.NestedStringWithAggregatesFilter> =
   z
     .object({
-      equals: z.string().optional(),
-      in: z.union([z.string().array(), z.string()]).optional(),
-      notIn: z.union([z.string().array(), z.string()]).optional(),
-      lt: z.string().optional(),
-      lte: z.string().optional(),
-      gt: z.string().optional(),
-      gte: z.string().optional(),
-      contains: z.string().optional(),
-      startsWith: z.string().optional(),
-      endsWith: z.string().optional(),
+      equals: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      in: z
+        .union([
+          z.string().array(),
+          z.lazy(() => ListStringFieldRefInputSchema),
+        ])
+        .optional(),
+      notIn: z
+        .union([
+          z.string().array(),
+          z.lazy(() => ListStringFieldRefInputSchema),
+        ])
+        .optional(),
+      lt: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      lte: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      gt: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      gte: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      contains: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      startsWith: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
+      endsWith: z
+        .union([z.string(), z.lazy(() => StringFieldRefInputSchema)])
+        .optional(),
       not: z
         .union([
           z.string(),
@@ -858,13 +1031,19 @@ export const NestedStringWithAggregatesFilterSchema: z.ZodType<Prisma.NestedStri
 
 export const NestedIntFilterSchema: z.ZodType<Prisma.NestedIntFilter> = z
   .object({
-    equals: z.number().optional(),
-    in: z.union([z.number().array(), z.number()]).optional(),
-    notIn: z.union([z.number().array(), z.number()]).optional(),
-    lt: z.number().optional(),
-    lte: z.number().optional(),
-    gt: z.number().optional(),
-    gte: z.number().optional(),
+    equals: z
+      .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+      .optional(),
+    in: z
+      .union([z.number().array(), z.lazy(() => ListIntFieldRefInputSchema)])
+      .optional(),
+    notIn: z
+      .union([z.number().array(), z.lazy(() => ListIntFieldRefInputSchema)])
+      .optional(),
+    lt: z.union([z.number(), z.lazy(() => IntFieldRefInputSchema)]).optional(),
+    lte: z.union([z.number(), z.lazy(() => IntFieldRefInputSchema)]).optional(),
+    gt: z.union([z.number(), z.lazy(() => IntFieldRefInputSchema)]).optional(),
+    gte: z.union([z.number(), z.lazy(() => IntFieldRefInputSchema)]).optional(),
     not: z.union([z.number(), z.lazy(() => NestedIntFilterSchema)]).optional(),
   })
   .strict();
@@ -872,17 +1051,22 @@ export const NestedIntFilterSchema: z.ZodType<Prisma.NestedIntFilter> = z
 export const NestedEnumLanguageFilterSchema: z.ZodType<Prisma.NestedEnumLanguageFilter> =
   z
     .object({
-      equals: z.lazy(() => LanguageSchema).optional(),
+      equals: z
+        .union([
+          z.lazy(() => LanguageSchema),
+          z.lazy(() => EnumLanguageFieldRefInputSchema),
+        ])
+        .optional(),
       in: z
         .union([
           z.lazy(() => LanguageSchema).array(),
-          z.lazy(() => LanguageSchema),
+          z.lazy(() => ListEnumLanguageFieldRefInputSchema),
         ])
         .optional(),
       notIn: z
         .union([
           z.lazy(() => LanguageSchema).array(),
-          z.lazy(() => LanguageSchema),
+          z.lazy(() => ListEnumLanguageFieldRefInputSchema),
         ])
         .optional(),
       not: z
@@ -897,17 +1081,22 @@ export const NestedEnumLanguageFilterSchema: z.ZodType<Prisma.NestedEnumLanguage
 export const NestedEnumLanguageWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumLanguageWithAggregatesFilter> =
   z
     .object({
-      equals: z.lazy(() => LanguageSchema).optional(),
+      equals: z
+        .union([
+          z.lazy(() => LanguageSchema),
+          z.lazy(() => EnumLanguageFieldRefInputSchema),
+        ])
+        .optional(),
       in: z
         .union([
           z.lazy(() => LanguageSchema).array(),
-          z.lazy(() => LanguageSchema),
+          z.lazy(() => ListEnumLanguageFieldRefInputSchema),
         ])
         .optional(),
       notIn: z
         .union([
           z.lazy(() => LanguageSchema).array(),
-          z.lazy(() => LanguageSchema),
+          z.lazy(() => ListEnumLanguageFieldRefInputSchema),
         ])
         .optional(),
       not: z
@@ -957,6 +1146,18 @@ export const SettingUpsertWithoutGuildInputSchema: z.ZodType<Prisma.SettingUpser
       create: z.union([
         z.lazy(() => SettingCreateWithoutGuildInputSchema),
         z.lazy(() => SettingUncheckedCreateWithoutGuildInputSchema),
+      ]),
+      where: z.lazy(() => SettingWhereInputSchema).optional(),
+    })
+    .strict();
+
+export const SettingUpdateToOneWithWhereWithoutGuildInputSchema: z.ZodType<Prisma.SettingUpdateToOneWithWhereWithoutGuildInput> =
+  z
+    .object({
+      where: z.lazy(() => SettingWhereInputSchema).optional(),
+      data: z.union([
+        z.lazy(() => SettingUpdateWithoutGuildInputSchema),
+        z.lazy(() => SettingUncheckedUpdateWithoutGuildInputSchema),
       ]),
     })
     .strict();
@@ -1022,6 +1223,18 @@ export const GuildUpsertWithoutSettingInputSchema: z.ZodType<Prisma.GuildUpsertW
       create: z.union([
         z.lazy(() => GuildCreateWithoutSettingInputSchema),
         z.lazy(() => GuildUncheckedCreateWithoutSettingInputSchema),
+      ]),
+      where: z.lazy(() => GuildWhereInputSchema).optional(),
+    })
+    .strict();
+
+export const GuildUpdateToOneWithWhereWithoutSettingInputSchema: z.ZodType<Prisma.GuildUpdateToOneWithWhereWithoutSettingInput> =
+  z
+    .object({
+      where: z.lazy(() => GuildWhereInputSchema).optional(),
+      data: z.union([
+        z.lazy(() => GuildUpdateWithoutSettingInputSchema),
+        z.lazy(() => GuildUncheckedUpdateWithoutSettingInputSchema),
       ]),
     })
     .strict();
