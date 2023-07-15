@@ -7,12 +7,12 @@ export const err = <E extends Error>(error: E): Err<E> => ({
   error,
 });
 
-export const resultMap = <T, E extends Error, U>(
+export const mapResult = <T, E extends Error, U>(
   result: Result<T, E>,
-  func: (data: T) => Result<U, E>
+  func: (data: T) => U
 ): Result<U, E> => {
   if (result.ok) {
-    return func(result.value);
+    return ok(func(result.value));
   }
   return result;
 };
