@@ -62,7 +62,7 @@ export type ApiSuccessfulResponse<T> = {
 export type ApiErrorResponse = {
   status: HttpErrorStatus;
   error: {
-    message: string;
+    message: Error | string;
   };
 };
 

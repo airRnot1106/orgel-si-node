@@ -1,10 +1,11 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 
-const app = new Hono();
-app.get('/', (c) => c.text('Hello Hono!'));
+import { guild } from '@/server/api/guild';
 
-const root = app;
+const app = new Hono().get('/', (c) => c.text('Hello Hono!'));
+
+const root = app.route('/guild', guild);
 
 if (process.env.NODE_ENV !== 'test') {
   serve(root, (info) => {
@@ -12,3 +13,5 @@ if (process.env.NODE_ENV !== 'test') {
     console.log(`Listening on http://localhost:${info.port}`);
   });
 }
+
+export type ApiType = typeof root;

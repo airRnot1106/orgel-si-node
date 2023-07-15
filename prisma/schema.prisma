@@ -38,7 +38,7 @@ enum Language {
 model Setting {
   id       String   @id
   guild    Guild    @relation(fields: [id], references: [id])
-  language Language
+  language Language @default(en)
 
   @@map("settings")
 }
