@@ -5,6 +5,7 @@
     "build": "tsx scripts/build.ts production",
     "build:dev": "tsx scripts/build.ts development",
     "test": "DATABASE_URL='postgresql://postgres:postgres@localhost:5432/postgres?schema=test' jest --verbose false --watchAll"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@discordjs/builders": "^1.6.3",
@@ -40,7 +41,9 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jest": "^27.2.2",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "husky": "^8.0.3",
     "jest": "^29.6.1",
+    "lint-staged": "^13.2.3",
     "node-fetch": "2",
     "prettier": "^3.0.0",
     "prisma": "^4.16.2",
