@@ -11,6 +11,7 @@
     "prisma:reset": "prisma migrate reset --force",
     "prisma:studio": "prisma studio",
     "test": "DATABASE_URL='postgresql://postgres:postgres@localhost:5432/postgres?schema=test' jest --verbose false --watchAll",
+    "test:init": "DATABASE_URL='postgresql://postgres:postgres@localhost:5432/postgres?schema=test' pnpm prisma:migrate",
     "prepare": "husky install"
   },
   "dependencies": {
