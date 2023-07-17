@@ -488,7 +488,7 @@ export const GuildUncheckedUpdateManyInputSchema: z.ZodType<Prisma.GuildUnchecke
 
 export const SettingCreateInputSchema: z.ZodType<Prisma.SettingCreateInput> = z
   .object({
-    language: z.lazy(() => LanguageSchema),
+    language: z.lazy(() => LanguageSchema).optional(),
     guild: z.lazy(() => GuildCreateNestedOneWithoutSettingInputSchema),
   })
   .strict();
@@ -497,7 +497,7 @@ export const SettingUncheckedCreateInputSchema: z.ZodType<Prisma.SettingUnchecke
   z
     .object({
       id: z.string(),
-      language: z.lazy(() => LanguageSchema),
+      language: z.lazy(() => LanguageSchema).optional(),
     })
     .strict();
 
@@ -537,7 +537,7 @@ export const SettingCreateManyInputSchema: z.ZodType<Prisma.SettingCreateManyInp
   z
     .object({
       id: z.string(),
-      language: z.lazy(() => LanguageSchema),
+      language: z.lazy(() => LanguageSchema).optional(),
     })
     .strict();
 
@@ -1114,14 +1114,14 @@ export const NestedEnumLanguageWithAggregatesFilterSchema: z.ZodType<Prisma.Nest
 export const SettingCreateWithoutGuildInputSchema: z.ZodType<Prisma.SettingCreateWithoutGuildInput> =
   z
     .object({
-      language: z.lazy(() => LanguageSchema),
+      language: z.lazy(() => LanguageSchema).optional(),
     })
     .strict();
 
 export const SettingUncheckedCreateWithoutGuildInputSchema: z.ZodType<Prisma.SettingUncheckedCreateWithoutGuildInput> =
   z
     .object({
-      language: z.lazy(() => LanguageSchema),
+      language: z.lazy(() => LanguageSchema).optional(),
     })
     .strict();
 

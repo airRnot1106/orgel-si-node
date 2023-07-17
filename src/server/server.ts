@@ -1,11 +1,12 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 
-import { guild } from '@/server/api/guild';
+import { guild } from '@/server/api/guild/route';
 
-const app = new Hono().get('/', (c) => c.text('Hello Hono!'));
+const app = new Hono().basePath('/api');
+app.get('/', (c) => c.text('Hello Hono!'));
 
-const root = app.route('/guild', guild);
+export const root = app.route('/guild', guild);
 
 if (process.env.NODE_ENV !== 'test') {
   serve(root, (info) => {

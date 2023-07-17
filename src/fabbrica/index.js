@@ -101,9 +101,7 @@ function isSettingguildFactory(x) {
     return x?._factoryFor === "Guild";
 }
 function autoGenerateSettingScalarsOrEnums({ seq }) {
-    return {
-        language: "en"
-    };
+    return {};
 }
 function defineSettingFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
     const getFactoryWithTraits = (traitKeys = []) => {
