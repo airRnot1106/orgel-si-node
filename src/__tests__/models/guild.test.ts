@@ -17,4 +17,30 @@ describe('guild model', () => {
       ).toStrictEqual(guild);
     });
   });
+
+  describe('delete', () => {
+    it('should delete a guild', async () => {
+      expect(await prisma.guild.count()).toBe(0);
+
+      const guildFactory = defineGuildFactory();
+
+      const guild = await guildFactory.create();
+
+      expect(await prisma.guild.count()).toBe(1);
+
+      await prisma.guild.delete({
+        where: {
+          id: guild.id,
+        },
+      });
+
+      expect(
+        await prisma.guild.findUnique({
+          where: {
+            id: guild.id,
+          },
+        })
+      ).toBeNull();
+    });
+  });
 });
