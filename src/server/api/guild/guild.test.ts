@@ -18,7 +18,7 @@ describe('guild api', () => {
       expect(res.status).toBe(200);
     });
 
-    it('should return 400 if guild already exists', async () => {
+    it('should return 409 if guild already exists', async () => {
       const guildFactory = defineGuildFactory();
       const { id, name } = await guildFactory.create();
 
@@ -30,7 +30,7 @@ describe('guild api', () => {
         }),
       });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(409);
     });
   });
 
@@ -49,7 +49,7 @@ describe('guild api', () => {
       expect(res.status).toBe(200);
     });
 
-    it('should return 400 if guild does not exist', async () => {
+    it('should return 404 if guild does not exist', async () => {
       const guildFactory = defineGuildFactory();
       const { id } = await guildFactory.build();
 
@@ -60,7 +60,7 @@ describe('guild api', () => {
         }),
       });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(404);
     });
   });
 });

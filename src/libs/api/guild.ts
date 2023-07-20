@@ -17,7 +17,7 @@ export const createGuild = async ({
 
     if (existsGuild) {
       return {
-        status: 400,
+        status: 409,
         error: {
           message: 'Guild already exists',
         },
@@ -69,7 +69,7 @@ export const deleteGuild = async ({
 
     if (!existsGuild) {
       return {
-        status: 400,
+        status: 404,
         error: {
           message: 'Guild not found',
         },
