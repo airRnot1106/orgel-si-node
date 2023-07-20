@@ -1,4 +1,4 @@
-import type { GuildDeleteBody, GuildPostBody } from '@/schema/api/guild';
+import type { DeleteGuildArgs, CreateGuildArgs } from '@/schema/api/guild';
 import type { ApiResponse } from '@/types/api';
 import type { GuildFull } from '@/types/model';
 
@@ -7,7 +7,7 @@ import prisma from '@/libs/prisma';
 export const createGuild = async ({
   id,
   name,
-}: GuildPostBody): Promise<ApiResponse<GuildFull>> => {
+}: CreateGuildArgs): Promise<ApiResponse<GuildFull>> => {
   try {
     const existsGuild = await prisma.guild.findUnique({
       where: {
@@ -59,7 +59,7 @@ export const createGuild = async ({
 
 export const deleteGuild = async ({
   id,
-}: GuildDeleteBody): Promise<ApiResponse<null>> => {
+}: DeleteGuildArgs): Promise<ApiResponse<null>> => {
   try {
     const existsGuild = await prisma.guild.findUnique({
       where: {

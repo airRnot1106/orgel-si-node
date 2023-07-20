@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-export const settingGetQuerySchema = z.object({
+export const getLanguageArgsSchema = z.object({
   id: z.string(),
 });
 
-export type SettingGetQuery = z.infer<typeof settingGetQuerySchema>;
+export type GetLanguageArgs = z.infer<typeof getLanguageArgsSchema>;

@@ -39,7 +39,7 @@ describe('guild api', () => {
       const guildFactory = defineGuildFactory();
       const { id } = await guildFactory.create();
 
-      const res = await root.request('/api/guild', {
+      const res = await root.request(`/api/guild/${id}`, {
         method: 'DELETE',
         body: JSON.stringify({
           id,
@@ -53,7 +53,7 @@ describe('guild api', () => {
       const guildFactory = defineGuildFactory();
       const { id } = await guildFactory.build();
 
-      const res = await root.request('/api/guild', {
+      const res = await root.request(`/api/guild/${id}`, {
         method: 'DELETE',
         body: JSON.stringify({
           id,

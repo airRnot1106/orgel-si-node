@@ -1,19 +1,19 @@
-import type { SettingGetQuery } from '@/schema/api/setting';
+import type { GetLanguageArgs } from '@/schema/api/setting';
 import type { ApiResponse } from '@/types/api';
 import type { SettingFull } from '@/types/model';
 
 import prisma from '@/libs/prisma';
 
-export const getSetting = async ({
+export const getLanguage = async ({
   id,
-}: SettingGetQuery): Promise<ApiResponse<SettingFull>> => {
+}: GetLanguageArgs): Promise<ApiResponse<Pick<SettingFull, 'language'>>> => {
   try {
     const setting = await prisma.setting.findUnique({
       where: {
         id,
       },
-      include: {
-        guild: true,
+      select: {
+        language: true,
       },
     });
 
