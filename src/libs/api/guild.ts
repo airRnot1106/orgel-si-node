@@ -1,4 +1,4 @@
-import type { DeleteGuildArgs, CreateGuildArgs } from '@/schema/api/guild';
+import type { DeleteGuildArgs, CreateGuildArgs } from '@/schema/guild';
 import type { ApiResponse } from '@/types/api';
 import type { GuildFull } from '@/types/model';
 

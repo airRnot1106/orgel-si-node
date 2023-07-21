@@ -1,4 +1,4 @@
-import type { GetLanguageArgs, UpdateLanguageArgs } from '@/schema/api/setting';
+import type { GetLanguageArgs, UpdateLanguageArgs } from '@/schema/setting';
 import type { ApiResponse } from '@/types/api';
 import type { SettingFull } from '@/types/model';
 

@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 
 import { createGuild, deleteGuild } from '@/libs/api/guild';
-import { createGuildArgsSchema } from '@/schema/api/guild';
+import { createGuildArgsSchema } from '@/schema/guild';
 
 export const guild = new Hono()
   .post(

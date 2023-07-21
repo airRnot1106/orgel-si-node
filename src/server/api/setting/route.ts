@@ -4,13 +4,13 @@ import { Hono } from 'hono';
 import { getLanguage, updateLanguage } from '@/libs/api/setting';
 import {
   patchLanguageBodySchema,
-  settingIdParamSchema,
-} from '@/schema/api/setting';
+  getSettingParamSchema,
+} from '@/schema/setting';
 
 export const setting = new Hono()
   .get(
     '/:id/language',
-    zValidator('param', settingIdParamSchema, (result, c) => {
+    zValidator('param', getSettingParamSchema, (result, c) => {
       if (!result.success) {
         return c.json(
           {
@@ -32,7 +32,7 @@ export const setting = new Hono()
   )
   .patch(
     '/:id/language',
-    zValidator('param', settingIdParamSchema, (result, c) => {
+    zValidator('param', getSettingParamSchema, (result, c) => {
       if (!result.success) {
         return c.json(
           {

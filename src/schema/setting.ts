@@ -2,11 +2,11 @@ import { z } from 'zod';
 
 import { LanguageSchema, SettingSchema } from '@/schema/generated/prisma';
 
-export const settingIdParamSchema = z.object({
+export const getSettingParamSchema = z.object({
   id: SettingSchema.shape.id,
 });
 
-export type SettingIdParam = z.infer<typeof settingIdParamSchema>;
+export type GetSettingParam = z.infer<typeof getSettingParamSchema>;
 
 export const getLanguageArgsSchema = z.object({
   id: z.string(),
@@ -17,6 +17,8 @@ export type GetLanguageArgs = z.infer<typeof getLanguageArgsSchema>;
 export const patchLanguageBodySchema = z.object({
   language: LanguageSchema,
 });
+
+export type PatchLanguageBody = z.infer<typeof patchLanguageBodySchema>;
 
 export const updateLanguageArgsSchema = z.object({
   id: z.string(),
