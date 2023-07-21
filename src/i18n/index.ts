@@ -11,6 +11,19 @@ export interface IMessage {
     description: () => string;
     content: () => string;
   };
+  setting: {
+    description: () => string;
+    language: {
+      description: () => string;
+      options: {
+        language: {
+          description: () => string;
+          invalid: () => string;
+          content: (args: { user: string; language: string }) => string;
+        };
+      };
+    };
+  };
 }
 
 const messages = {
