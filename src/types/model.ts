@@ -3,6 +3,7 @@ import type {
   GuildWithRelations,
   SettingWithRelations,
   VideoWithRelations,
+  User,
 } from '@/schema/generated/prisma';
 
 export type GuildFull = Pick<GuildWithRelations, 'id' | 'name'>;
@@ -23,3 +24,5 @@ export type VideoFull = Pick<
 > & {
   channel: ChannelFull;
 };
+
+export type UserFull = Pick<User, 'id' | 'name'>;

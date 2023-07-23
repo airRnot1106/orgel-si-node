@@ -4,6 +4,7 @@ import { Hono } from 'hono';
 import { channel } from '@/server/api/channel/route';
 import { guild } from '@/server/api/guild/route';
 import { setting } from '@/server/api/setting/route';
+import { user } from '@/server/api/user/route';
 import { video } from '@/server/api/video/route';
 
 const app = new Hono().basePath('/api');
@@ -13,7 +14,8 @@ export const root = app
   .route('/guild', guild)
   .route('/setting', setting)
   .route('/channel', channel)
-  .route('/video', video);
+  .route('/video', video)
+  .route('/user', user);
 
 if (process.env.NODE_ENV !== 'test') {
   serve(root, (info) => {

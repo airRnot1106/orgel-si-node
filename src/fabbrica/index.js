@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineVideoFactory = exports.defineChannelFactory = exports.defineSettingFactory = exports.defineGuildFactory = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = exports.initialize = void 0;
+exports.defineUserFactory = exports.defineVideoFactory = exports.defineChannelFactory = exports.defineSettingFactory = exports.defineGuildFactory = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = exports.initialize = void 0;
 const internal_1 = require("@quramy/prisma-fabbrica/lib/internal");
 var internal_2 = require("@quramy/prisma-fabbrica/lib/internal");
 Object.defineProperty(exports, "initialize", { enumerable: true, get: function () { return internal_2.initialize; } });
@@ -35,6 +35,9 @@ const modelFieldDefinitions = [{
                 type: "Channel",
                 relationName: "ChannelToVideo"
             }]
+    }, {
+        name: "User",
+        fields: []
     }];
 function isGuildSettingFactory(x) {
     return x?._factoryFor === "Setting";
@@ -330,3 +333,71 @@ function defineVideoFactory(options) {
     return defineVideoFactoryInternal(options);
 }
 exports.defineVideoFactory = defineVideoFactory;
+function autoGenerateUserScalarsOrEnums({ seq }) {
+    return {
+        id: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "id", isId: true, isUnique: false, seq }),
+        name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "name", isId: false, isUnique: false, seq })
+    };
+}
+function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+    const getFactoryWithTraits = (traitKeys = []) => {
+        const seqKey = {};
+        const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
+        const screen = (0, internal_1.createScreener)("User", modelFieldDefinitions);
+        const build = async (inputData = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {};
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
+        };
+        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const pickForConnect = (inputData) => ({
+            id: inputData.id
+        });
+        const create = async (inputData = {}) => {
+            const data = await build(inputData).then(screen);
+            return await (0, internal_1.getClient)().user.create({ data });
+        };
+        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "User",
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
+    };
+    const factory = getFactoryWithTraits();
+    const useTraits = (name, ...names) => {
+        return getFactoryWithTraits([name, ...names]);
+    };
+    return {
+        ...factory,
+        use: useTraits,
+    };
+}
+/**
+ * Define factory for {@link User} model.
+ *
+ * @param options
+ * @returns factory {@link UserFactoryInterface}
+ */
+function defineUserFactory(options) {
+    return defineUserFactoryInternal(options ?? {});
+}
+exports.defineUserFactory = defineUserFactory;
