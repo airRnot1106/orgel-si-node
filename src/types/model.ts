@@ -3,26 +3,54 @@ import type {
   GuildWithRelations,
   SettingWithRelations,
   VideoWithRelations,
-  User,
+  UserWithRelations,
+  RequestWithRelations,
 } from '@/schema/generated/prisma';
 
-export type GuildFull = Pick<GuildWithRelations, 'id' | 'name'>;
+export type GuildFull = Pick<
+  GuildWithRelations,
+  'id' | 'name' | 'createdAt' | 'updatedAt'
+>;
 
 export type SettingFull = Pick<
   SettingWithRelations,
-  'id' | 'guild' | 'language'
+  'id' | 'guild' | 'language' | 'createdAt' | 'updatedAt'
 >;
 
 export type ChannelFull = Pick<
   ChannelWithRelations,
-  'id' | 'name' | 'user' | 'url'
+  'id' | 'name' | 'user' | 'url' | 'createdAt' | 'updatedAt'
 >;
 
 export type VideoFull = Pick<
   VideoWithRelations,
-  'id' | 'title' | 'description' | 'url' | 'channelId'
+  | 'id'
+  | 'title'
+  | 'description'
+  | 'url'
+  | 'channelId'
+  | 'createdAt'
+  | 'updatedAt'
 > & {
   channel: ChannelFull;
 };
 
-export type UserFull = Pick<User, 'id' | 'name'>;
+export type UserFull = Pick<
+  UserWithRelations,
+  'id' | 'name' | 'createdAt' | 'updatedAt'
+>;
+
+export type RequestFull = Pick<
+  RequestWithRelations,
+  | 'id'
+  | 'guildId'
+  | 'userId'
+  | 'videoId'
+  | 'playedAt'
+  | 'createdAt'
+  | 'updatedAt'
+> & {
+  guild: GuildFull;
+  user: UserFull;
+  video: VideoFull;
+};

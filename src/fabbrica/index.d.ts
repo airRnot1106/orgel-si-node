@@ -3,6 +3,7 @@ import type { Setting } from '@prisma/client';
 import type { Channel } from '@prisma/client';
 import type { Video } from '@prisma/client';
 import type { User } from '@prisma/client';
+import type { Request } from '@prisma/client';
 import type { Language } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { Resolver } from '@quramy/prisma-fabbrica/lib/internal';
@@ -24,9 +25,12 @@ type GuildSettingFactory = {
 type GuildFactoryDefineInput = {
   id?: string;
   name?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
   Setting?:
     | GuildSettingFactory
     | Prisma.SettingCreateNestedOneWithoutGuildInput;
+  Request?: Prisma.RequestCreateNestedManyWithoutGuildInput;
 };
 type GuildFactoryDefineOptions = {
   defaultData?: Resolver<GuildFactoryDefineInput, BuildDataOptions>;
@@ -83,6 +87,8 @@ type SettingguildFactory = {
 };
 type SettingFactoryDefineInput = {
   language?: Language;
+  createdAt?: Date;
+  updatedAt?: Date;
   guild: SettingguildFactory | Prisma.GuildCreateNestedOneWithoutSettingInput;
 };
 type SettingFactoryDefineOptions = {
@@ -137,6 +143,8 @@ type ChannelFactoryDefineInput = {
   name?: string;
   user?: string;
   url?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
   Video?: Prisma.VideoCreateNestedManyWithoutChannelInput;
 };
 type ChannelFactoryDefineOptions = {
@@ -197,7 +205,10 @@ type VideoFactoryDefineInput = {
   title?: string;
   description?: string;
   url?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
   channel: VideochannelFactory | Prisma.ChannelCreateNestedOneWithoutVideoInput;
+  Request?: Prisma.RequestCreateNestedManyWithoutVideoInput;
 };
 type VideoFactoryDefineOptions = {
   defaultData: Resolver<VideoFactoryDefineInput, BuildDataOptions>;
@@ -249,6 +260,9 @@ export declare function defineVideoFactory<
 type UserFactoryDefineInput = {
   id?: string;
   name?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  Request?: Prisma.RequestCreateNestedManyWithoutUserInput;
 };
 type UserFactoryDefineOptions = {
   defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
@@ -297,3 +311,77 @@ export interface UserFactoryInterface<
 export declare function defineUserFactory<
   TOptions extends UserFactoryDefineOptions,
 >(options?: TOptions): UserFactoryInterface<TOptions>;
+type RequestguildFactory = {
+  _factoryFor: 'Guild';
+  build: () => PromiseLike<
+    Prisma.GuildCreateNestedOneWithoutRequestInput['create']
+  >;
+};
+type RequestuserFactory = {
+  _factoryFor: 'User';
+  build: () => PromiseLike<
+    Prisma.UserCreateNestedOneWithoutRequestInput['create']
+  >;
+};
+type RequestvideoFactory = {
+  _factoryFor: 'Video';
+  build: () => PromiseLike<
+    Prisma.VideoCreateNestedOneWithoutRequestInput['create']
+  >;
+};
+type RequestFactoryDefineInput = {
+  id?: string;
+  playedAt?: Date | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+  guild: RequestguildFactory | Prisma.GuildCreateNestedOneWithoutRequestInput;
+  user: RequestuserFactory | Prisma.UserCreateNestedOneWithoutRequestInput;
+  video: RequestvideoFactory | Prisma.VideoCreateNestedOneWithoutRequestInput;
+};
+type RequestFactoryDefineOptions = {
+  defaultData: Resolver<RequestFactoryDefineInput, BuildDataOptions>;
+  traits?: {
+    [traitName: string | symbol]: {
+      data: Resolver<Partial<RequestFactoryDefineInput>, BuildDataOptions>;
+    };
+  };
+};
+type RequestTraitKeys<TOptions extends RequestFactoryDefineOptions> =
+  keyof TOptions['traits'];
+export interface RequestFactoryInterfaceWithoutTraits {
+  readonly _factoryFor: 'Request';
+  build(
+    inputData?: Partial<Prisma.RequestCreateInput>
+  ): PromiseLike<Prisma.RequestCreateInput>;
+  buildCreateInput(
+    inputData?: Partial<Prisma.RequestCreateInput>
+  ): PromiseLike<Prisma.RequestCreateInput>;
+  buildList(
+    inputData: number | readonly Partial<Prisma.RequestCreateInput>[]
+  ): PromiseLike<Prisma.RequestCreateInput[]>;
+  pickForConnect(inputData: Request): Pick<Request, 'id'>;
+  create(inputData?: Partial<Prisma.RequestCreateInput>): PromiseLike<Request>;
+  createList(
+    inputData: number | readonly Partial<Prisma.RequestCreateInput>[]
+  ): PromiseLike<Request[]>;
+  createForConnect(
+    inputData?: Partial<Prisma.RequestCreateInput>
+  ): PromiseLike<Pick<Request, 'id'>>;
+}
+export interface RequestFactoryInterface<
+  TOptions extends RequestFactoryDefineOptions = RequestFactoryDefineOptions,
+> extends RequestFactoryInterfaceWithoutTraits {
+  use(
+    name: RequestTraitKeys<TOptions>,
+    ...names: readonly RequestTraitKeys<TOptions>[]
+  ): RequestFactoryInterfaceWithoutTraits;
+}
+/**
+ * Define factory for {@link Request} model.
+ *
+ * @param options
+ * @returns factory {@link RequestFactoryInterface}
+ */
+export declare function defineRequestFactory<
+  TOptions extends RequestFactoryDefineOptions,
+>(options: TOptions): RequestFactoryInterface<TOptions>;

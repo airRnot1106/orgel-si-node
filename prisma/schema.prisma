@@ -23,9 +23,12 @@ datasource db {
 }
 
 model Guild {
-  id      String   @id
-  name    String
-  Setting Setting?
+  id        String    @id
+  name      String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  Setting   Setting?
+  Request   Request[]
 
   @@map("guilds")
 }
@@ -36,37 +39,62 @@ enum Language {
 }
 
 model Setting {
-  id       String   @id
-  guild    Guild    @relation(fields: [id], references: [id])
-  language Language @default(en)
+  id        String   @id
+  guild     Guild    @relation(fields: [id], references: [id])
+  language  Language @default(en)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("settings")
 }
 
 model Channel {
-  id    String  @id
-  name  String
-  user  String
-  url   String
-  Video Video[]
+  id        String   @id
+  name      String
+  user      String
+  url       String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  Video     Video[]
 
   @@map("channels")
 }
 
 model Video {
-  id          String  @id
+  id          String    @id
   title       String
   description String
   url         String
-  channelId   String  @map("channel_id")
-  channel     Channel @relation(fields: [channelId], references: [id])
+  channelId   String    @map("channel_id")
+  channel     Channel   @relation(fields: [channelId], references: [id])
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  Request     Request[]
 
   @@map("videos")
 }
 
 model User {
-  id   String @id
-  name String
+  id        String    @id
+  name      String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  Request   Request[]
 
   @@map("users")
+}
+
+model Request {
+  id        String    @id @default(uuid())
+  guildId   String    @map("guild_id")
+  guild     Guild     @relation(fields: [guildId], references: [id])
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id])
+  videoId   String    @map("video_id")
+  video     Video     @relation(fields: [videoId], references: [id])
+  playedAt  DateTime? @map("played_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("requests")
 }
