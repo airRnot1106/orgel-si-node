@@ -42,3 +42,24 @@ model Setting {
 
   @@map("settings")
 }
+
+model Channel {
+  id    String  @id
+  name  String
+  user  String
+  url   String
+  Video Video[]
+
+  @@map("channels")
+}
+
+model Video {
+  id          String  @id
+  title       String
+  description String
+  url         String
+  channelId   String
+  channel     Channel @relation(fields: [channelId], references: [id])
+
+  @@map("videos")
+}

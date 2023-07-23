@@ -1,13 +1,19 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 
+import { channel } from '@/server/api/channel/route';
 import { guild } from '@/server/api/guild/route';
 import { setting } from '@/server/api/setting/route';
+import { video } from '@/server/api/video/route';
 
 const app = new Hono().basePath('/api');
 app.get('/', (c) => c.text('Hello Hono!'));
 
-export const root = app.route('/guild', guild).route('/setting', setting);
+export const root = app
+  .route('/guild', guild)
+  .route('/setting', setting)
+  .route('/channel', channel)
+  .route('/video', video);
 
 if (process.env.NODE_ENV !== 'test') {
   serve(root, (info) => {
