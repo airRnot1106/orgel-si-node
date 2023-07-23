@@ -4,6 +4,7 @@ import type { Channel } from '@prisma/client';
 import type { Video } from '@prisma/client';
 import type { User } from '@prisma/client';
 import type { Request } from '@prisma/client';
+import type { Queue } from '@prisma/client';
 import type { Language } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { Resolver } from '@quramy/prisma-fabbrica/lib/internal';
@@ -31,6 +32,7 @@ type GuildFactoryDefineInput = {
     | GuildSettingFactory
     | Prisma.SettingCreateNestedOneWithoutGuildInput;
   Request?: Prisma.RequestCreateNestedManyWithoutGuildInput;
+  Queue?: Prisma.QueueCreateNestedManyWithoutGuildInput;
 };
 type GuildFactoryDefineOptions = {
   defaultData?: Resolver<GuildFactoryDefineInput, BuildDataOptions>;
@@ -337,6 +339,7 @@ type RequestFactoryDefineInput = {
   guild: RequestguildFactory | Prisma.GuildCreateNestedOneWithoutRequestInput;
   user: RequestuserFactory | Prisma.UserCreateNestedOneWithoutRequestInput;
   video: RequestvideoFactory | Prisma.VideoCreateNestedOneWithoutRequestInput;
+  Queue?: Prisma.QueueCreateNestedManyWithoutRequestInput;
 };
 type RequestFactoryDefineOptions = {
   defaultData: Resolver<RequestFactoryDefineInput, BuildDataOptions>;
@@ -385,3 +388,70 @@ export interface RequestFactoryInterface<
 export declare function defineRequestFactory<
   TOptions extends RequestFactoryDefineOptions,
 >(options: TOptions): RequestFactoryInterface<TOptions>;
+type QueueguildFactory = {
+  _factoryFor: 'Guild';
+  build: () => PromiseLike<
+    Prisma.GuildCreateNestedOneWithoutQueueInput['create']
+  >;
+};
+type QueuerequestFactory = {
+  _factoryFor: 'Request';
+  build: () => PromiseLike<
+    Prisma.RequestCreateNestedOneWithoutQueueInput['create']
+  >;
+};
+type QueueFactoryDefineInput = {
+  id?: string;
+  order?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  guild: QueueguildFactory | Prisma.GuildCreateNestedOneWithoutQueueInput;
+  request: QueuerequestFactory | Prisma.RequestCreateNestedOneWithoutQueueInput;
+};
+type QueueFactoryDefineOptions = {
+  defaultData: Resolver<QueueFactoryDefineInput, BuildDataOptions>;
+  traits?: {
+    [traitName: string | symbol]: {
+      data: Resolver<Partial<QueueFactoryDefineInput>, BuildDataOptions>;
+    };
+  };
+};
+type QueueTraitKeys<TOptions extends QueueFactoryDefineOptions> =
+  keyof TOptions['traits'];
+export interface QueueFactoryInterfaceWithoutTraits {
+  readonly _factoryFor: 'Queue';
+  build(
+    inputData?: Partial<Prisma.QueueCreateInput>
+  ): PromiseLike<Prisma.QueueCreateInput>;
+  buildCreateInput(
+    inputData?: Partial<Prisma.QueueCreateInput>
+  ): PromiseLike<Prisma.QueueCreateInput>;
+  buildList(
+    inputData: number | readonly Partial<Prisma.QueueCreateInput>[]
+  ): PromiseLike<Prisma.QueueCreateInput[]>;
+  pickForConnect(inputData: Queue): Pick<Queue, 'id'>;
+  create(inputData?: Partial<Prisma.QueueCreateInput>): PromiseLike<Queue>;
+  createList(
+    inputData: number | readonly Partial<Prisma.QueueCreateInput>[]
+  ): PromiseLike<Queue[]>;
+  createForConnect(
+    inputData?: Partial<Prisma.QueueCreateInput>
+  ): PromiseLike<Pick<Queue, 'id'>>;
+}
+export interface QueueFactoryInterface<
+  TOptions extends QueueFactoryDefineOptions = QueueFactoryDefineOptions,
+> extends QueueFactoryInterfaceWithoutTraits {
+  use(
+    name: QueueTraitKeys<TOptions>,
+    ...names: readonly QueueTraitKeys<TOptions>[]
+  ): QueueFactoryInterfaceWithoutTraits;
+}
+/**
+ * Define factory for {@link Queue} model.
+ *
+ * @param options
+ * @returns factory {@link QueueFactoryInterface}
+ */
+export declare function defineQueueFactory<
+  TOptions extends QueueFactoryDefineOptions,
+>(options: TOptions): QueueFactoryInterface<TOptions>;

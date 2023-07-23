@@ -66,6 +66,15 @@ export const RequestScalarFieldEnumSchema = z.enum([
   'updatedAt',
 ]);
 
+export const QueueScalarFieldEnumSchema = z.enum([
+  'id',
+  'guildId',
+  'requestId',
+  'order',
+  'createdAt',
+  'updatedAt',
+]);
+
 export const SortOrderSchema = z.enum(['asc', 'desc']);
 
 export const QueryModeSchema = z.enum(['default', 'insensitive']);
@@ -99,6 +108,7 @@ export type Guild = z.infer<typeof GuildSchema>;
 export type GuildRelations = {
   Setting?: SettingWithRelations | null;
   Request: RequestWithRelations[];
+  Queue: QueueWithRelations[];
 };
 
 export type GuildWithRelations = z.infer<typeof GuildSchema> & GuildRelations;
@@ -108,6 +118,7 @@ export const GuildWithRelationsSchema: z.ZodType<GuildWithRelations> =
     z.object({
       Setting: z.lazy(() => SettingWithRelationsSchema).nullable(),
       Request: z.lazy(() => RequestWithRelationsSchema).array(),
+      Queue: z.lazy(() => QueueWithRelationsSchema).array(),
     })
   );
 
@@ -259,6 +270,7 @@ export type RequestRelations = {
   guild: GuildWithRelations;
   user: UserWithRelations;
   video: VideoWithRelations;
+  Queue: QueueWithRelations[];
 };
 
 export type RequestWithRelations = z.infer<typeof RequestSchema> &
@@ -270,6 +282,40 @@ export const RequestWithRelationsSchema: z.ZodType<RequestWithRelations> =
       guild: z.lazy(() => GuildWithRelationsSchema),
       user: z.lazy(() => UserWithRelationsSchema),
       video: z.lazy(() => VideoWithRelationsSchema),
+      Queue: z.lazy(() => QueueWithRelationsSchema).array(),
+    })
+  );
+
+/////////////////////////////////////////
+// QUEUE SCHEMA
+/////////////////////////////////////////
+
+export const QueueSchema = z.object({
+  id: z.string().uuid(),
+  guildId: z.string(),
+  requestId: z.string(),
+  order: z.number().int(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+export type Queue = z.infer<typeof QueueSchema>;
+
+// QUEUE RELATION SCHEMA
+//------------------------------------------------------
+
+export type QueueRelations = {
+  guild: GuildWithRelations;
+  request: RequestWithRelations;
+};
+
+export type QueueWithRelations = z.infer<typeof QueueSchema> & QueueRelations;
+
+export const QueueWithRelationsSchema: z.ZodType<QueueWithRelations> =
+  QueueSchema.merge(
+    z.object({
+      guild: z.lazy(() => GuildWithRelationsSchema),
+      request: z.lazy(() => RequestWithRelationsSchema),
     })
   );
 
@@ -285,6 +331,9 @@ export const GuildIncludeSchema: z.ZodType<Prisma.GuildInclude> = z
     Setting: z.union([z.boolean(), z.lazy(() => SettingArgsSchema)]).optional(),
     Request: z
       .union([z.boolean(), z.lazy(() => RequestFindManyArgsSchema)])
+      .optional(),
+    Queue: z
+      .union([z.boolean(), z.lazy(() => QueueFindManyArgsSchema)])
       .optional(),
     _count: z
       .union([z.boolean(), z.lazy(() => GuildCountOutputTypeArgsSchema)])
@@ -310,6 +359,7 @@ export const GuildCountOutputTypeSelectSchema: z.ZodType<Prisma.GuildCountOutput
   z
     .object({
       Request: z.boolean().optional(),
+      Queue: z.boolean().optional(),
     })
     .strict();
 
@@ -322,6 +372,9 @@ export const GuildSelectSchema: z.ZodType<Prisma.GuildSelect> = z
     Setting: z.union([z.boolean(), z.lazy(() => SettingArgsSchema)]).optional(),
     Request: z
       .union([z.boolean(), z.lazy(() => RequestFindManyArgsSchema)])
+      .optional(),
+    Queue: z
+      .union([z.boolean(), z.lazy(() => QueueFindManyArgsSchema)])
       .optional(),
     _count: z
       .union([z.boolean(), z.lazy(() => GuildCountOutputTypeArgsSchema)])
@@ -520,6 +573,12 @@ export const RequestIncludeSchema: z.ZodType<Prisma.RequestInclude> = z
     guild: z.union([z.boolean(), z.lazy(() => GuildArgsSchema)]).optional(),
     user: z.union([z.boolean(), z.lazy(() => UserArgsSchema)]).optional(),
     video: z.union([z.boolean(), z.lazy(() => VideoArgsSchema)]).optional(),
+    Queue: z
+      .union([z.boolean(), z.lazy(() => QueueFindManyArgsSchema)])
+      .optional(),
+    _count: z
+      .union([z.boolean(), z.lazy(() => RequestCountOutputTypeArgsSchema)])
+      .optional(),
   })
   .strict();
 
@@ -529,6 +588,20 @@ export const RequestArgsSchema: z.ZodType<Prisma.RequestArgs> = z
     include: z.lazy(() => RequestIncludeSchema).optional(),
   })
   .strict();
+
+export const RequestCountOutputTypeArgsSchema: z.ZodType<Prisma.RequestCountOutputTypeArgs> =
+  z
+    .object({
+      select: z.lazy(() => RequestCountOutputTypeSelectSchema).nullish(),
+    })
+    .strict();
+
+export const RequestCountOutputTypeSelectSchema: z.ZodType<Prisma.RequestCountOutputTypeSelect> =
+  z
+    .object({
+      Queue: z.boolean().optional(),
+    })
+    .strict();
 
 export const RequestSelectSchema: z.ZodType<Prisma.RequestSelect> = z
   .object({
@@ -542,6 +615,42 @@ export const RequestSelectSchema: z.ZodType<Prisma.RequestSelect> = z
     guild: z.union([z.boolean(), z.lazy(() => GuildArgsSchema)]).optional(),
     user: z.union([z.boolean(), z.lazy(() => UserArgsSchema)]).optional(),
     video: z.union([z.boolean(), z.lazy(() => VideoArgsSchema)]).optional(),
+    Queue: z
+      .union([z.boolean(), z.lazy(() => QueueFindManyArgsSchema)])
+      .optional(),
+    _count: z
+      .union([z.boolean(), z.lazy(() => RequestCountOutputTypeArgsSchema)])
+      .optional(),
+  })
+  .strict();
+
+// QUEUE
+//------------------------------------------------------
+
+export const QueueIncludeSchema: z.ZodType<Prisma.QueueInclude> = z
+  .object({
+    guild: z.union([z.boolean(), z.lazy(() => GuildArgsSchema)]).optional(),
+    request: z.union([z.boolean(), z.lazy(() => RequestArgsSchema)]).optional(),
+  })
+  .strict();
+
+export const QueueArgsSchema: z.ZodType<Prisma.QueueArgs> = z
+  .object({
+    select: z.lazy(() => QueueSelectSchema).optional(),
+    include: z.lazy(() => QueueIncludeSchema).optional(),
+  })
+  .strict();
+
+export const QueueSelectSchema: z.ZodType<Prisma.QueueSelect> = z
+  .object({
+    id: z.boolean().optional(),
+    guildId: z.boolean().optional(),
+    requestId: z.boolean().optional(),
+    order: z.boolean().optional(),
+    createdAt: z.boolean().optional(),
+    updatedAt: z.boolean().optional(),
+    guild: z.union([z.boolean(), z.lazy(() => GuildArgsSchema)]).optional(),
+    request: z.union([z.boolean(), z.lazy(() => RequestArgsSchema)]).optional(),
   })
   .strict();
 
@@ -583,6 +692,7 @@ export const GuildWhereInputSchema: z.ZodType<Prisma.GuildWhereInput> = z
       .optional()
       .nullable(),
     Request: z.lazy(() => RequestListRelationFilterSchema).optional(),
+    Queue: z.lazy(() => QueueListRelationFilterSchema).optional(),
   })
   .strict();
 
@@ -597,6 +707,7 @@ export const GuildOrderByWithRelationInputSchema: z.ZodType<Prisma.GuildOrderByW
       Request: z
         .lazy(() => RequestOrderByRelationAggregateInputSchema)
         .optional(),
+      Queue: z.lazy(() => QueueOrderByRelationAggregateInputSchema).optional(),
     })
     .strict();
 
@@ -642,6 +753,7 @@ export const GuildWhereUniqueInputSchema: z.ZodType<Prisma.GuildWhereUniqueInput
             .optional()
             .nullable(),
           Request: z.lazy(() => RequestListRelationFilterSchema).optional(),
+          Queue: z.lazy(() => QueueListRelationFilterSchema).optional(),
         })
         .strict()
     );
@@ -1368,6 +1480,7 @@ export const RequestWhereInputSchema: z.ZodType<Prisma.RequestWhereInput> = z
         z.lazy(() => VideoWhereInputSchema),
       ])
       .optional(),
+    Queue: z.lazy(() => QueueListRelationFilterSchema).optional(),
   })
   .strict();
 
@@ -1389,6 +1502,7 @@ export const RequestOrderByWithRelationInputSchema: z.ZodType<Prisma.RequestOrde
       guild: z.lazy(() => GuildOrderByWithRelationInputSchema).optional(),
       user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
       video: z.lazy(() => VideoOrderByWithRelationInputSchema).optional(),
+      Queue: z.lazy(() => QueueOrderByRelationAggregateInputSchema).optional(),
     })
     .strict();
 
@@ -1457,6 +1571,7 @@ export const RequestWhereUniqueInputSchema: z.ZodType<Prisma.RequestWhereUniqueI
               z.lazy(() => VideoWhereInputSchema),
             ])
             .optional(),
+          Queue: z.lazy(() => QueueListRelationFilterSchema).optional(),
         })
         .strict()
     );
@@ -1535,6 +1650,184 @@ export const RequestScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.Reque
     })
     .strict();
 
+export const QueueWhereInputSchema: z.ZodType<Prisma.QueueWhereInput> = z
+  .object({
+    AND: z
+      .union([
+        z.lazy(() => QueueWhereInputSchema),
+        z.lazy(() => QueueWhereInputSchema).array(),
+      ])
+      .optional(),
+    OR: z
+      .lazy(() => QueueWhereInputSchema)
+      .array()
+      .optional(),
+    NOT: z
+      .union([
+        z.lazy(() => QueueWhereInputSchema),
+        z.lazy(() => QueueWhereInputSchema).array(),
+      ])
+      .optional(),
+    id: z.union([z.lazy(() => StringFilterSchema), z.string()]).optional(),
+    guildId: z.union([z.lazy(() => StringFilterSchema), z.string()]).optional(),
+    requestId: z
+      .union([z.lazy(() => StringFilterSchema), z.string()])
+      .optional(),
+    order: z.union([z.lazy(() => IntFilterSchema), z.number()]).optional(),
+    createdAt: z
+      .union([z.lazy(() => DateTimeFilterSchema), z.coerce.date()])
+      .optional(),
+    updatedAt: z
+      .union([z.lazy(() => DateTimeFilterSchema), z.coerce.date()])
+      .optional(),
+    guild: z
+      .union([
+        z.lazy(() => GuildRelationFilterSchema),
+        z.lazy(() => GuildWhereInputSchema),
+      ])
+      .optional(),
+    request: z
+      .union([
+        z.lazy(() => RequestRelationFilterSchema),
+        z.lazy(() => RequestWhereInputSchema),
+      ])
+      .optional(),
+  })
+  .strict();
+
+export const QueueOrderByWithRelationInputSchema: z.ZodType<Prisma.QueueOrderByWithRelationInput> =
+  z
+    .object({
+      id: z.lazy(() => SortOrderSchema).optional(),
+      guildId: z.lazy(() => SortOrderSchema).optional(),
+      requestId: z.lazy(() => SortOrderSchema).optional(),
+      order: z.lazy(() => SortOrderSchema).optional(),
+      createdAt: z.lazy(() => SortOrderSchema).optional(),
+      updatedAt: z.lazy(() => SortOrderSchema).optional(),
+      guild: z.lazy(() => GuildOrderByWithRelationInputSchema).optional(),
+      request: z.lazy(() => RequestOrderByWithRelationInputSchema).optional(),
+    })
+    .strict();
+
+export const QueueWhereUniqueInputSchema: z.ZodType<Prisma.QueueWhereUniqueInput> =
+  z
+    .object({
+      id: z.string().uuid(),
+    })
+    .and(
+      z
+        .object({
+          id: z.string().uuid().optional(),
+          AND: z
+            .union([
+              z.lazy(() => QueueWhereInputSchema),
+              z.lazy(() => QueueWhereInputSchema).array(),
+            ])
+            .optional(),
+          OR: z
+            .lazy(() => QueueWhereInputSchema)
+            .array()
+            .optional(),
+          NOT: z
+            .union([
+              z.lazy(() => QueueWhereInputSchema),
+              z.lazy(() => QueueWhereInputSchema).array(),
+            ])
+            .optional(),
+          guildId: z
+            .union([z.lazy(() => StringFilterSchema), z.string()])
+            .optional(),
+          requestId: z
+            .union([z.lazy(() => StringFilterSchema), z.string()])
+            .optional(),
+          order: z
+            .union([z.lazy(() => IntFilterSchema), z.number().int()])
+            .optional(),
+          createdAt: z
+            .union([z.lazy(() => DateTimeFilterSchema), z.coerce.date()])
+            .optional(),
+          updatedAt: z
+            .union([z.lazy(() => DateTimeFilterSchema), z.coerce.date()])
+            .optional(),
+          guild: z
+            .union([
+              z.lazy(() => GuildRelationFilterSchema),
+              z.lazy(() => GuildWhereInputSchema),
+            ])
+            .optional(),
+          request: z
+            .union([
+              z.lazy(() => RequestRelationFilterSchema),
+              z.lazy(() => RequestWhereInputSchema),
+            ])
+            .optional(),
+        })
+        .strict()
+    );
+
+export const QueueOrderByWithAggregationInputSchema: z.ZodType<Prisma.QueueOrderByWithAggregationInput> =
+  z
+    .object({
+      id: z.lazy(() => SortOrderSchema).optional(),
+      guildId: z.lazy(() => SortOrderSchema).optional(),
+      requestId: z.lazy(() => SortOrderSchema).optional(),
+      order: z.lazy(() => SortOrderSchema).optional(),
+      createdAt: z.lazy(() => SortOrderSchema).optional(),
+      updatedAt: z.lazy(() => SortOrderSchema).optional(),
+      _count: z.lazy(() => QueueCountOrderByAggregateInputSchema).optional(),
+      _avg: z.lazy(() => QueueAvgOrderByAggregateInputSchema).optional(),
+      _max: z.lazy(() => QueueMaxOrderByAggregateInputSchema).optional(),
+      _min: z.lazy(() => QueueMinOrderByAggregateInputSchema).optional(),
+      _sum: z.lazy(() => QueueSumOrderByAggregateInputSchema).optional(),
+    })
+    .strict();
+
+export const QueueScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.QueueScalarWhereWithAggregatesInput> =
+  z
+    .object({
+      AND: z
+        .union([
+          z.lazy(() => QueueScalarWhereWithAggregatesInputSchema),
+          z.lazy(() => QueueScalarWhereWithAggregatesInputSchema).array(),
+        ])
+        .optional(),
+      OR: z
+        .lazy(() => QueueScalarWhereWithAggregatesInputSchema)
+        .array()
+        .optional(),
+      NOT: z
+        .union([
+          z.lazy(() => QueueScalarWhereWithAggregatesInputSchema),
+          z.lazy(() => QueueScalarWhereWithAggregatesInputSchema).array(),
+        ])
+        .optional(),
+      id: z
+        .union([z.lazy(() => StringWithAggregatesFilterSchema), z.string()])
+        .optional(),
+      guildId: z
+        .union([z.lazy(() => StringWithAggregatesFilterSchema), z.string()])
+        .optional(),
+      requestId: z
+        .union([z.lazy(() => StringWithAggregatesFilterSchema), z.string()])
+        .optional(),
+      order: z
+        .union([z.lazy(() => IntWithAggregatesFilterSchema), z.number()])
+        .optional(),
+      createdAt: z
+        .union([
+          z.lazy(() => DateTimeWithAggregatesFilterSchema),
+          z.coerce.date(),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.lazy(() => DateTimeWithAggregatesFilterSchema),
+          z.coerce.date(),
+        ])
+        .optional(),
+    })
+    .strict();
+
 export const GuildCreateInputSchema: z.ZodType<Prisma.GuildCreateInput> = z
   .object({
     id: z.string(),
@@ -1546,6 +1839,9 @@ export const GuildCreateInputSchema: z.ZodType<Prisma.GuildCreateInput> = z
       .optional(),
     Request: z
       .lazy(() => RequestCreateNestedManyWithoutGuildInputSchema)
+      .optional(),
+    Queue: z
+      .lazy(() => QueueCreateNestedManyWithoutGuildInputSchema)
       .optional(),
   })
   .strict();
@@ -1562,6 +1858,9 @@ export const GuildUncheckedCreateInputSchema: z.ZodType<Prisma.GuildUncheckedCre
         .optional(),
       Request: z
         .lazy(() => RequestUncheckedCreateNestedManyWithoutGuildInputSchema)
+        .optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedCreateNestedManyWithoutGuildInputSchema)
         .optional(),
     })
     .strict();
@@ -1591,6 +1890,9 @@ export const GuildUpdateInputSchema: z.ZodType<Prisma.GuildUpdateInput> = z
       .optional(),
     Request: z
       .lazy(() => RequestUpdateManyWithoutGuildNestedInputSchema)
+      .optional(),
+    Queue: z
+      .lazy(() => QueueUpdateManyWithoutGuildNestedInputSchema)
       .optional(),
   })
   .strict();
@@ -1627,6 +1929,9 @@ export const GuildUncheckedUpdateInputSchema: z.ZodType<Prisma.GuildUncheckedUpd
         .optional(),
       Request: z
         .lazy(() => RequestUncheckedUpdateManyWithoutGuildNestedInputSchema)
+        .optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedUpdateManyWithoutGuildNestedInputSchema)
         .optional(),
     })
     .strict();
@@ -2425,6 +2730,9 @@ export const RequestCreateInputSchema: z.ZodType<Prisma.RequestCreateInput> = z
     guild: z.lazy(() => GuildCreateNestedOneWithoutRequestInputSchema),
     user: z.lazy(() => UserCreateNestedOneWithoutRequestInputSchema),
     video: z.lazy(() => VideoCreateNestedOneWithoutRequestInputSchema),
+    Queue: z
+      .lazy(() => QueueCreateNestedManyWithoutRequestInputSchema)
+      .optional(),
   })
   .strict();
 
@@ -2438,6 +2746,9 @@ export const RequestUncheckedCreateInputSchema: z.ZodType<Prisma.RequestUnchecke
       playedAt: z.coerce.date().optional().nullable(),
       createdAt: z.coerce.date().optional(),
       updatedAt: z.coerce.date().optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedCreateNestedManyWithoutRequestInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -2476,6 +2787,9 @@ export const RequestUpdateInputSchema: z.ZodType<Prisma.RequestUpdateInput> = z
       .optional(),
     video: z
       .lazy(() => VideoUpdateOneRequiredWithoutRequestNestedInputSchema)
+      .optional(),
+    Queue: z
+      .lazy(() => QueueUpdateManyWithoutRequestNestedInputSchema)
       .optional(),
   })
   .strict();
@@ -2525,6 +2839,9 @@ export const RequestUncheckedUpdateInputSchema: z.ZodType<Prisma.RequestUnchecke
           z.coerce.date(),
           z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
         ])
+        .optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedUpdateManyWithoutRequestNestedInputSchema)
         .optional(),
     })
     .strict();
@@ -2607,6 +2924,190 @@ export const RequestUncheckedUpdateManyInputSchema: z.ZodType<Prisma.RequestUnch
         ])
         .optional()
         .nullable(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueCreateInputSchema: z.ZodType<Prisma.QueueCreateInput> = z
+  .object({
+    id: z.string().uuid().optional(),
+    order: z.number().int(),
+    createdAt: z.coerce.date().optional(),
+    updatedAt: z.coerce.date().optional(),
+    guild: z.lazy(() => GuildCreateNestedOneWithoutQueueInputSchema),
+    request: z.lazy(() => RequestCreateNestedOneWithoutQueueInputSchema),
+  })
+  .strict();
+
+export const QueueUncheckedCreateInputSchema: z.ZodType<Prisma.QueueUncheckedCreateInput> =
+  z
+    .object({
+      id: z.string().uuid().optional(),
+      guildId: z.string(),
+      requestId: z.string(),
+      order: z.number().int(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+    })
+    .strict();
+
+export const QueueUpdateInputSchema: z.ZodType<Prisma.QueueUpdateInput> = z
+  .object({
+    id: z
+      .union([
+        z.string().uuid(),
+        z.lazy(() => StringFieldUpdateOperationsInputSchema),
+      ])
+      .optional(),
+    order: z
+      .union([
+        z.number().int(),
+        z.lazy(() => IntFieldUpdateOperationsInputSchema),
+      ])
+      .optional(),
+    createdAt: z
+      .union([
+        z.coerce.date(),
+        z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+      ])
+      .optional(),
+    updatedAt: z
+      .union([
+        z.coerce.date(),
+        z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+      ])
+      .optional(),
+    guild: z
+      .lazy(() => GuildUpdateOneRequiredWithoutQueueNestedInputSchema)
+      .optional(),
+    request: z
+      .lazy(() => RequestUpdateOneRequiredWithoutQueueNestedInputSchema)
+      .optional(),
+  })
+  .strict();
+
+export const QueueUncheckedUpdateInputSchema: z.ZodType<Prisma.QueueUncheckedUpdateInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      guildId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      requestId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      order: z
+        .union([
+          z.number().int(),
+          z.lazy(() => IntFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueCreateManyInputSchema: z.ZodType<Prisma.QueueCreateManyInput> =
+  z
+    .object({
+      id: z.string().uuid().optional(),
+      guildId: z.string(),
+      requestId: z.string(),
+      order: z.number().int(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+    })
+    .strict();
+
+export const QueueUpdateManyMutationInputSchema: z.ZodType<Prisma.QueueUpdateManyMutationInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      order: z
+        .union([
+          z.number().int(),
+          z.lazy(() => IntFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueUncheckedUpdateManyInputSchema: z.ZodType<Prisma.QueueUncheckedUpdateManyInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      guildId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      requestId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      order: z
+        .union([
+          z.number().int(),
+          z.lazy(() => IntFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
       createdAt: z
         .union([
           z.coerce.date(),
@@ -2719,7 +3220,23 @@ export const RequestListRelationFilterSchema: z.ZodType<Prisma.RequestListRelati
     })
     .strict();
 
+export const QueueListRelationFilterSchema: z.ZodType<Prisma.QueueListRelationFilter> =
+  z
+    .object({
+      every: z.lazy(() => QueueWhereInputSchema).optional(),
+      some: z.lazy(() => QueueWhereInputSchema).optional(),
+      none: z.lazy(() => QueueWhereInputSchema).optional(),
+    })
+    .strict();
+
 export const RequestOrderByRelationAggregateInputSchema: z.ZodType<Prisma.RequestOrderByRelationAggregateInput> =
+  z
+    .object({
+      _count: z.lazy(() => SortOrderSchema).optional(),
+    })
+    .strict();
+
+export const QueueOrderByRelationAggregateInputSchema: z.ZodType<Prisma.QueueOrderByRelationAggregateInput> =
   z
     .object({
       _count: z.lazy(() => SortOrderSchema).optional(),
@@ -3229,6 +3746,118 @@ export const DateTimeNullableWithAggregatesFilterSchema: z.ZodType<Prisma.DateTi
     })
     .strict();
 
+export const IntFilterSchema: z.ZodType<Prisma.IntFilter> = z
+  .object({
+    equals: z
+      .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+      .optional(),
+    in: z
+      .union([z.number().array(), z.lazy(() => ListIntFieldRefInputSchema)])
+      .optional(),
+    notIn: z
+      .union([z.number().array(), z.lazy(() => ListIntFieldRefInputSchema)])
+      .optional(),
+    lt: z.union([z.number(), z.lazy(() => IntFieldRefInputSchema)]).optional(),
+    lte: z.union([z.number(), z.lazy(() => IntFieldRefInputSchema)]).optional(),
+    gt: z.union([z.number(), z.lazy(() => IntFieldRefInputSchema)]).optional(),
+    gte: z.union([z.number(), z.lazy(() => IntFieldRefInputSchema)]).optional(),
+    not: z.union([z.number(), z.lazy(() => NestedIntFilterSchema)]).optional(),
+  })
+  .strict();
+
+export const RequestRelationFilterSchema: z.ZodType<Prisma.RequestRelationFilter> =
+  z
+    .object({
+      is: z.lazy(() => RequestWhereInputSchema).optional(),
+      isNot: z.lazy(() => RequestWhereInputSchema).optional(),
+    })
+    .strict();
+
+export const QueueCountOrderByAggregateInputSchema: z.ZodType<Prisma.QueueCountOrderByAggregateInput> =
+  z
+    .object({
+      id: z.lazy(() => SortOrderSchema).optional(),
+      guildId: z.lazy(() => SortOrderSchema).optional(),
+      requestId: z.lazy(() => SortOrderSchema).optional(),
+      order: z.lazy(() => SortOrderSchema).optional(),
+      createdAt: z.lazy(() => SortOrderSchema).optional(),
+      updatedAt: z.lazy(() => SortOrderSchema).optional(),
+    })
+    .strict();
+
+export const QueueAvgOrderByAggregateInputSchema: z.ZodType<Prisma.QueueAvgOrderByAggregateInput> =
+  z
+    .object({
+      order: z.lazy(() => SortOrderSchema).optional(),
+    })
+    .strict();
+
+export const QueueMaxOrderByAggregateInputSchema: z.ZodType<Prisma.QueueMaxOrderByAggregateInput> =
+  z
+    .object({
+      id: z.lazy(() => SortOrderSchema).optional(),
+      guildId: z.lazy(() => SortOrderSchema).optional(),
+      requestId: z.lazy(() => SortOrderSchema).optional(),
+      order: z.lazy(() => SortOrderSchema).optional(),
+      createdAt: z.lazy(() => SortOrderSchema).optional(),
+      updatedAt: z.lazy(() => SortOrderSchema).optional(),
+    })
+    .strict();
+
+export const QueueMinOrderByAggregateInputSchema: z.ZodType<Prisma.QueueMinOrderByAggregateInput> =
+  z
+    .object({
+      id: z.lazy(() => SortOrderSchema).optional(),
+      guildId: z.lazy(() => SortOrderSchema).optional(),
+      requestId: z.lazy(() => SortOrderSchema).optional(),
+      order: z.lazy(() => SortOrderSchema).optional(),
+      createdAt: z.lazy(() => SortOrderSchema).optional(),
+      updatedAt: z.lazy(() => SortOrderSchema).optional(),
+    })
+    .strict();
+
+export const QueueSumOrderByAggregateInputSchema: z.ZodType<Prisma.QueueSumOrderByAggregateInput> =
+  z
+    .object({
+      order: z.lazy(() => SortOrderSchema).optional(),
+    })
+    .strict();
+
+export const IntWithAggregatesFilterSchema: z.ZodType<Prisma.IntWithAggregatesFilter> =
+  z
+    .object({
+      equals: z
+        .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+        .optional(),
+      in: z
+        .union([z.number().array(), z.lazy(() => ListIntFieldRefInputSchema)])
+        .optional(),
+      notIn: z
+        .union([z.number().array(), z.lazy(() => ListIntFieldRefInputSchema)])
+        .optional(),
+      lt: z
+        .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+        .optional(),
+      lte: z
+        .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+        .optional(),
+      gt: z
+        .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+        .optional(),
+      gte: z
+        .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+        .optional(),
+      not: z
+        .union([z.number(), z.lazy(() => NestedIntWithAggregatesFilterSchema)])
+        .optional(),
+      _count: z.lazy(() => NestedIntFilterSchema).optional(),
+      _avg: z.lazy(() => NestedFloatFilterSchema).optional(),
+      _sum: z.lazy(() => NestedIntFilterSchema).optional(),
+      _min: z.lazy(() => NestedIntFilterSchema).optional(),
+      _max: z.lazy(() => NestedIntFilterSchema).optional(),
+    })
+    .strict();
+
 export const SettingCreateNestedOneWithoutGuildInputSchema: z.ZodType<Prisma.SettingCreateNestedOneWithoutGuildInput> =
   z
     .object({
@@ -3274,6 +3903,35 @@ export const RequestCreateNestedManyWithoutGuildInputSchema: z.ZodType<Prisma.Re
     })
     .strict();
 
+export const QueueCreateNestedManyWithoutGuildInputSchema: z.ZodType<Prisma.QueueCreateNestedManyWithoutGuildInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => QueueCreateWithoutGuildInputSchema),
+          z.lazy(() => QueueCreateWithoutGuildInputSchema).array(),
+          z.lazy(() => QueueUncheckedCreateWithoutGuildInputSchema),
+          z.lazy(() => QueueUncheckedCreateWithoutGuildInputSchema).array(),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .union([
+          z.lazy(() => QueueCreateOrConnectWithoutGuildInputSchema),
+          z.lazy(() => QueueCreateOrConnectWithoutGuildInputSchema).array(),
+        ])
+        .optional(),
+      createMany: z
+        .lazy(() => QueueCreateManyGuildInputEnvelopeSchema)
+        .optional(),
+      connect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+    })
+    .strict();
+
 export const SettingUncheckedCreateNestedOneWithoutGuildInputSchema: z.ZodType<Prisma.SettingUncheckedCreateNestedOneWithoutGuildInput> =
   z
     .object({
@@ -3314,6 +3972,35 @@ export const RequestUncheckedCreateNestedManyWithoutGuildInputSchema: z.ZodType<
         .union([
           z.lazy(() => RequestWhereUniqueInputSchema),
           z.lazy(() => RequestWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueUncheckedCreateNestedManyWithoutGuildInputSchema: z.ZodType<Prisma.QueueUncheckedCreateNestedManyWithoutGuildInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => QueueCreateWithoutGuildInputSchema),
+          z.lazy(() => QueueCreateWithoutGuildInputSchema).array(),
+          z.lazy(() => QueueUncheckedCreateWithoutGuildInputSchema),
+          z.lazy(() => QueueUncheckedCreateWithoutGuildInputSchema).array(),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .union([
+          z.lazy(() => QueueCreateOrConnectWithoutGuildInputSchema),
+          z.lazy(() => QueueCreateOrConnectWithoutGuildInputSchema).array(),
+        ])
+        .optional(),
+      createMany: z
+        .lazy(() => QueueCreateManyGuildInputEnvelopeSchema)
+        .optional(),
+      connect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
         ])
         .optional(),
     })
@@ -3440,6 +4127,81 @@ export const RequestUpdateManyWithoutGuildNestedInputSchema: z.ZodType<Prisma.Re
     })
     .strict();
 
+export const QueueUpdateManyWithoutGuildNestedInputSchema: z.ZodType<Prisma.QueueUpdateManyWithoutGuildNestedInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => QueueCreateWithoutGuildInputSchema),
+          z.lazy(() => QueueCreateWithoutGuildInputSchema).array(),
+          z.lazy(() => QueueUncheckedCreateWithoutGuildInputSchema),
+          z.lazy(() => QueueUncheckedCreateWithoutGuildInputSchema).array(),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .union([
+          z.lazy(() => QueueCreateOrConnectWithoutGuildInputSchema),
+          z.lazy(() => QueueCreateOrConnectWithoutGuildInputSchema).array(),
+        ])
+        .optional(),
+      upsert: z
+        .union([
+          z.lazy(() => QueueUpsertWithWhereUniqueWithoutGuildInputSchema),
+          z
+            .lazy(() => QueueUpsertWithWhereUniqueWithoutGuildInputSchema)
+            .array(),
+        ])
+        .optional(),
+      createMany: z
+        .lazy(() => QueueCreateManyGuildInputEnvelopeSchema)
+        .optional(),
+      set: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      disconnect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      delete: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      connect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      update: z
+        .union([
+          z.lazy(() => QueueUpdateWithWhereUniqueWithoutGuildInputSchema),
+          z
+            .lazy(() => QueueUpdateWithWhereUniqueWithoutGuildInputSchema)
+            .array(),
+        ])
+        .optional(),
+      updateMany: z
+        .union([
+          z.lazy(() => QueueUpdateManyWithWhereWithoutGuildInputSchema),
+          z.lazy(() => QueueUpdateManyWithWhereWithoutGuildInputSchema).array(),
+        ])
+        .optional(),
+      deleteMany: z
+        .union([
+          z.lazy(() => QueueScalarWhereInputSchema),
+          z.lazy(() => QueueScalarWhereInputSchema).array(),
+        ])
+        .optional(),
+    })
+    .strict();
+
 export const SettingUncheckedUpdateOneWithoutGuildNestedInputSchema: z.ZodType<Prisma.SettingUncheckedUpdateOneWithoutGuildNestedInput> =
   z
     .object({
@@ -3542,6 +4304,81 @@ export const RequestUncheckedUpdateManyWithoutGuildNestedInputSchema: z.ZodType<
         .union([
           z.lazy(() => RequestScalarWhereInputSchema),
           z.lazy(() => RequestScalarWhereInputSchema).array(),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueUncheckedUpdateManyWithoutGuildNestedInputSchema: z.ZodType<Prisma.QueueUncheckedUpdateManyWithoutGuildNestedInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => QueueCreateWithoutGuildInputSchema),
+          z.lazy(() => QueueCreateWithoutGuildInputSchema).array(),
+          z.lazy(() => QueueUncheckedCreateWithoutGuildInputSchema),
+          z.lazy(() => QueueUncheckedCreateWithoutGuildInputSchema).array(),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .union([
+          z.lazy(() => QueueCreateOrConnectWithoutGuildInputSchema),
+          z.lazy(() => QueueCreateOrConnectWithoutGuildInputSchema).array(),
+        ])
+        .optional(),
+      upsert: z
+        .union([
+          z.lazy(() => QueueUpsertWithWhereUniqueWithoutGuildInputSchema),
+          z
+            .lazy(() => QueueUpsertWithWhereUniqueWithoutGuildInputSchema)
+            .array(),
+        ])
+        .optional(),
+      createMany: z
+        .lazy(() => QueueCreateManyGuildInputEnvelopeSchema)
+        .optional(),
+      set: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      disconnect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      delete: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      connect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      update: z
+        .union([
+          z.lazy(() => QueueUpdateWithWhereUniqueWithoutGuildInputSchema),
+          z
+            .lazy(() => QueueUpdateWithWhereUniqueWithoutGuildInputSchema)
+            .array(),
+        ])
+        .optional(),
+      updateMany: z
+        .union([
+          z.lazy(() => QueueUpdateManyWithWhereWithoutGuildInputSchema),
+          z.lazy(() => QueueUpdateManyWithWhereWithoutGuildInputSchema).array(),
+        ])
+        .optional(),
+      deleteMany: z
+        .union([
+          z.lazy(() => QueueScalarWhereInputSchema),
+          z.lazy(() => QueueScalarWhereInputSchema).array(),
         ])
         .optional(),
     })
@@ -4318,6 +5155,64 @@ export const VideoCreateNestedOneWithoutRequestInputSchema: z.ZodType<Prisma.Vid
     })
     .strict();
 
+export const QueueCreateNestedManyWithoutRequestInputSchema: z.ZodType<Prisma.QueueCreateNestedManyWithoutRequestInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => QueueCreateWithoutRequestInputSchema),
+          z.lazy(() => QueueCreateWithoutRequestInputSchema).array(),
+          z.lazy(() => QueueUncheckedCreateWithoutRequestInputSchema),
+          z.lazy(() => QueueUncheckedCreateWithoutRequestInputSchema).array(),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .union([
+          z.lazy(() => QueueCreateOrConnectWithoutRequestInputSchema),
+          z.lazy(() => QueueCreateOrConnectWithoutRequestInputSchema).array(),
+        ])
+        .optional(),
+      createMany: z
+        .lazy(() => QueueCreateManyRequestInputEnvelopeSchema)
+        .optional(),
+      connect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueUncheckedCreateNestedManyWithoutRequestInputSchema: z.ZodType<Prisma.QueueUncheckedCreateNestedManyWithoutRequestInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => QueueCreateWithoutRequestInputSchema),
+          z.lazy(() => QueueCreateWithoutRequestInputSchema).array(),
+          z.lazy(() => QueueUncheckedCreateWithoutRequestInputSchema),
+          z.lazy(() => QueueUncheckedCreateWithoutRequestInputSchema).array(),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .union([
+          z.lazy(() => QueueCreateOrConnectWithoutRequestInputSchema),
+          z.lazy(() => QueueCreateOrConnectWithoutRequestInputSchema).array(),
+        ])
+        .optional(),
+      createMany: z
+        .lazy(() => QueueCreateManyRequestInputEnvelopeSchema)
+        .optional(),
+      connect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+    })
+    .strict();
+
 export const NullableDateTimeFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableDateTimeFieldUpdateOperationsInput> =
   z
     .object({
@@ -4392,6 +5287,251 @@ export const VideoUpdateOneRequiredWithoutRequestNestedInputSchema: z.ZodType<Pr
           z.lazy(() => VideoUpdateToOneWithWhereWithoutRequestInputSchema),
           z.lazy(() => VideoUpdateWithoutRequestInputSchema),
           z.lazy(() => VideoUncheckedUpdateWithoutRequestInputSchema),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueUpdateManyWithoutRequestNestedInputSchema: z.ZodType<Prisma.QueueUpdateManyWithoutRequestNestedInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => QueueCreateWithoutRequestInputSchema),
+          z.lazy(() => QueueCreateWithoutRequestInputSchema).array(),
+          z.lazy(() => QueueUncheckedCreateWithoutRequestInputSchema),
+          z.lazy(() => QueueUncheckedCreateWithoutRequestInputSchema).array(),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .union([
+          z.lazy(() => QueueCreateOrConnectWithoutRequestInputSchema),
+          z.lazy(() => QueueCreateOrConnectWithoutRequestInputSchema).array(),
+        ])
+        .optional(),
+      upsert: z
+        .union([
+          z.lazy(() => QueueUpsertWithWhereUniqueWithoutRequestInputSchema),
+          z
+            .lazy(() => QueueUpsertWithWhereUniqueWithoutRequestInputSchema)
+            .array(),
+        ])
+        .optional(),
+      createMany: z
+        .lazy(() => QueueCreateManyRequestInputEnvelopeSchema)
+        .optional(),
+      set: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      disconnect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      delete: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      connect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      update: z
+        .union([
+          z.lazy(() => QueueUpdateWithWhereUniqueWithoutRequestInputSchema),
+          z
+            .lazy(() => QueueUpdateWithWhereUniqueWithoutRequestInputSchema)
+            .array(),
+        ])
+        .optional(),
+      updateMany: z
+        .union([
+          z.lazy(() => QueueUpdateManyWithWhereWithoutRequestInputSchema),
+          z
+            .lazy(() => QueueUpdateManyWithWhereWithoutRequestInputSchema)
+            .array(),
+        ])
+        .optional(),
+      deleteMany: z
+        .union([
+          z.lazy(() => QueueScalarWhereInputSchema),
+          z.lazy(() => QueueScalarWhereInputSchema).array(),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueUncheckedUpdateManyWithoutRequestNestedInputSchema: z.ZodType<Prisma.QueueUncheckedUpdateManyWithoutRequestNestedInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => QueueCreateWithoutRequestInputSchema),
+          z.lazy(() => QueueCreateWithoutRequestInputSchema).array(),
+          z.lazy(() => QueueUncheckedCreateWithoutRequestInputSchema),
+          z.lazy(() => QueueUncheckedCreateWithoutRequestInputSchema).array(),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .union([
+          z.lazy(() => QueueCreateOrConnectWithoutRequestInputSchema),
+          z.lazy(() => QueueCreateOrConnectWithoutRequestInputSchema).array(),
+        ])
+        .optional(),
+      upsert: z
+        .union([
+          z.lazy(() => QueueUpsertWithWhereUniqueWithoutRequestInputSchema),
+          z
+            .lazy(() => QueueUpsertWithWhereUniqueWithoutRequestInputSchema)
+            .array(),
+        ])
+        .optional(),
+      createMany: z
+        .lazy(() => QueueCreateManyRequestInputEnvelopeSchema)
+        .optional(),
+      set: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      disconnect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      delete: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      connect: z
+        .union([
+          z.lazy(() => QueueWhereUniqueInputSchema),
+          z.lazy(() => QueueWhereUniqueInputSchema).array(),
+        ])
+        .optional(),
+      update: z
+        .union([
+          z.lazy(() => QueueUpdateWithWhereUniqueWithoutRequestInputSchema),
+          z
+            .lazy(() => QueueUpdateWithWhereUniqueWithoutRequestInputSchema)
+            .array(),
+        ])
+        .optional(),
+      updateMany: z
+        .union([
+          z.lazy(() => QueueUpdateManyWithWhereWithoutRequestInputSchema),
+          z
+            .lazy(() => QueueUpdateManyWithWhereWithoutRequestInputSchema)
+            .array(),
+        ])
+        .optional(),
+      deleteMany: z
+        .union([
+          z.lazy(() => QueueScalarWhereInputSchema),
+          z.lazy(() => QueueScalarWhereInputSchema).array(),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const GuildCreateNestedOneWithoutQueueInputSchema: z.ZodType<Prisma.GuildCreateNestedOneWithoutQueueInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => GuildCreateWithoutQueueInputSchema),
+          z.lazy(() => GuildUncheckedCreateWithoutQueueInputSchema),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .lazy(() => GuildCreateOrConnectWithoutQueueInputSchema)
+        .optional(),
+      connect: z.lazy(() => GuildWhereUniqueInputSchema).optional(),
+    })
+    .strict();
+
+export const RequestCreateNestedOneWithoutQueueInputSchema: z.ZodType<Prisma.RequestCreateNestedOneWithoutQueueInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => RequestCreateWithoutQueueInputSchema),
+          z.lazy(() => RequestUncheckedCreateWithoutQueueInputSchema),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .lazy(() => RequestCreateOrConnectWithoutQueueInputSchema)
+        .optional(),
+      connect: z.lazy(() => RequestWhereUniqueInputSchema).optional(),
+    })
+    .strict();
+
+export const IntFieldUpdateOperationsInputSchema: z.ZodType<Prisma.IntFieldUpdateOperationsInput> =
+  z
+    .object({
+      set: z.number().optional(),
+      increment: z.number().optional(),
+      decrement: z.number().optional(),
+      multiply: z.number().optional(),
+      divide: z.number().optional(),
+    })
+    .strict();
+
+export const GuildUpdateOneRequiredWithoutQueueNestedInputSchema: z.ZodType<Prisma.GuildUpdateOneRequiredWithoutQueueNestedInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => GuildCreateWithoutQueueInputSchema),
+          z.lazy(() => GuildUncheckedCreateWithoutQueueInputSchema),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .lazy(() => GuildCreateOrConnectWithoutQueueInputSchema)
+        .optional(),
+      upsert: z.lazy(() => GuildUpsertWithoutQueueInputSchema).optional(),
+      connect: z.lazy(() => GuildWhereUniqueInputSchema).optional(),
+      update: z
+        .union([
+          z.lazy(() => GuildUpdateToOneWithWhereWithoutQueueInputSchema),
+          z.lazy(() => GuildUpdateWithoutQueueInputSchema),
+          z.lazy(() => GuildUncheckedUpdateWithoutQueueInputSchema),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const RequestUpdateOneRequiredWithoutQueueNestedInputSchema: z.ZodType<Prisma.RequestUpdateOneRequiredWithoutQueueNestedInput> =
+  z
+    .object({
+      create: z
+        .union([
+          z.lazy(() => RequestCreateWithoutQueueInputSchema),
+          z.lazy(() => RequestUncheckedCreateWithoutQueueInputSchema),
+        ])
+        .optional(),
+      connectOrCreate: z
+        .lazy(() => RequestCreateOrConnectWithoutQueueInputSchema)
+        .optional(),
+      upsert: z.lazy(() => RequestUpsertWithoutQueueInputSchema).optional(),
+      connect: z.lazy(() => RequestWhereUniqueInputSchema).optional(),
+      update: z
+        .union([
+          z.lazy(() => RequestUpdateToOneWithWhereWithoutQueueInputSchema),
+          z.lazy(() => RequestUpdateWithoutQueueInputSchema),
+          z.lazy(() => RequestUncheckedUpdateWithoutQueueInputSchema),
         ])
         .optional(),
     })
@@ -4769,6 +5909,70 @@ export const NestedIntNullableFilterSchema: z.ZodType<Prisma.NestedIntNullableFi
     })
     .strict();
 
+export const NestedIntWithAggregatesFilterSchema: z.ZodType<Prisma.NestedIntWithAggregatesFilter> =
+  z
+    .object({
+      equals: z
+        .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+        .optional(),
+      in: z
+        .union([z.number().array(), z.lazy(() => ListIntFieldRefInputSchema)])
+        .optional(),
+      notIn: z
+        .union([z.number().array(), z.lazy(() => ListIntFieldRefInputSchema)])
+        .optional(),
+      lt: z
+        .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+        .optional(),
+      lte: z
+        .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+        .optional(),
+      gt: z
+        .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+        .optional(),
+      gte: z
+        .union([z.number(), z.lazy(() => IntFieldRefInputSchema)])
+        .optional(),
+      not: z
+        .union([z.number(), z.lazy(() => NestedIntWithAggregatesFilterSchema)])
+        .optional(),
+      _count: z.lazy(() => NestedIntFilterSchema).optional(),
+      _avg: z.lazy(() => NestedFloatFilterSchema).optional(),
+      _sum: z.lazy(() => NestedIntFilterSchema).optional(),
+      _min: z.lazy(() => NestedIntFilterSchema).optional(),
+      _max: z.lazy(() => NestedIntFilterSchema).optional(),
+    })
+    .strict();
+
+export const NestedFloatFilterSchema: z.ZodType<Prisma.NestedFloatFilter> = z
+  .object({
+    equals: z
+      .union([z.number(), z.lazy(() => FloatFieldRefInputSchema)])
+      .optional(),
+    in: z
+      .union([z.number().array(), z.lazy(() => ListFloatFieldRefInputSchema)])
+      .optional(),
+    notIn: z
+      .union([z.number().array(), z.lazy(() => ListFloatFieldRefInputSchema)])
+      .optional(),
+    lt: z
+      .union([z.number(), z.lazy(() => FloatFieldRefInputSchema)])
+      .optional(),
+    lte: z
+      .union([z.number(), z.lazy(() => FloatFieldRefInputSchema)])
+      .optional(),
+    gt: z
+      .union([z.number(), z.lazy(() => FloatFieldRefInputSchema)])
+      .optional(),
+    gte: z
+      .union([z.number(), z.lazy(() => FloatFieldRefInputSchema)])
+      .optional(),
+    not: z
+      .union([z.number(), z.lazy(() => NestedFloatFilterSchema)])
+      .optional(),
+  })
+  .strict();
+
 export const SettingCreateWithoutGuildInputSchema: z.ZodType<Prisma.SettingCreateWithoutGuildInput> =
   z
     .object({
@@ -4807,6 +6011,9 @@ export const RequestCreateWithoutGuildInputSchema: z.ZodType<Prisma.RequestCreat
       updatedAt: z.coerce.date().optional(),
       user: z.lazy(() => UserCreateNestedOneWithoutRequestInputSchema),
       video: z.lazy(() => VideoCreateNestedOneWithoutRequestInputSchema),
+      Queue: z
+        .lazy(() => QueueCreateNestedManyWithoutRequestInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -4819,6 +6026,9 @@ export const RequestUncheckedCreateWithoutGuildInputSchema: z.ZodType<Prisma.Req
       playedAt: z.coerce.date().optional().nullable(),
       createdAt: z.coerce.date().optional(),
       updatedAt: z.coerce.date().optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedCreateNestedManyWithoutRequestInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -4839,6 +6049,50 @@ export const RequestCreateManyGuildInputEnvelopeSchema: z.ZodType<Prisma.Request
       data: z.union([
         z.lazy(() => RequestCreateManyGuildInputSchema),
         z.lazy(() => RequestCreateManyGuildInputSchema).array(),
+      ]),
+      skipDuplicates: z.boolean().optional(),
+    })
+    .strict();
+
+export const QueueCreateWithoutGuildInputSchema: z.ZodType<Prisma.QueueCreateWithoutGuildInput> =
+  z
+    .object({
+      id: z.string().uuid().optional(),
+      order: z.number().int(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+      request: z.lazy(() => RequestCreateNestedOneWithoutQueueInputSchema),
+    })
+    .strict();
+
+export const QueueUncheckedCreateWithoutGuildInputSchema: z.ZodType<Prisma.QueueUncheckedCreateWithoutGuildInput> =
+  z
+    .object({
+      id: z.string().uuid().optional(),
+      requestId: z.string(),
+      order: z.number().int(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+    })
+    .strict();
+
+export const QueueCreateOrConnectWithoutGuildInputSchema: z.ZodType<Prisma.QueueCreateOrConnectWithoutGuildInput> =
+  z
+    .object({
+      where: z.lazy(() => QueueWhereUniqueInputSchema),
+      create: z.union([
+        z.lazy(() => QueueCreateWithoutGuildInputSchema),
+        z.lazy(() => QueueUncheckedCreateWithoutGuildInputSchema),
+      ]),
+    })
+    .strict();
+
+export const QueueCreateManyGuildInputEnvelopeSchema: z.ZodType<Prisma.QueueCreateManyGuildInputEnvelope> =
+  z
+    .object({
+      data: z.union([
+        z.lazy(() => QueueCreateManyGuildInputSchema),
+        z.lazy(() => QueueCreateManyGuildInputSchema).array(),
       ]),
       skipDuplicates: z.boolean().optional(),
     })
@@ -4997,6 +6251,79 @@ export const RequestScalarWhereInputSchema: z.ZodType<Prisma.RequestScalarWhereI
     })
     .strict();
 
+export const QueueUpsertWithWhereUniqueWithoutGuildInputSchema: z.ZodType<Prisma.QueueUpsertWithWhereUniqueWithoutGuildInput> =
+  z
+    .object({
+      where: z.lazy(() => QueueWhereUniqueInputSchema),
+      update: z.union([
+        z.lazy(() => QueueUpdateWithoutGuildInputSchema),
+        z.lazy(() => QueueUncheckedUpdateWithoutGuildInputSchema),
+      ]),
+      create: z.union([
+        z.lazy(() => QueueCreateWithoutGuildInputSchema),
+        z.lazy(() => QueueUncheckedCreateWithoutGuildInputSchema),
+      ]),
+    })
+    .strict();
+
+export const QueueUpdateWithWhereUniqueWithoutGuildInputSchema: z.ZodType<Prisma.QueueUpdateWithWhereUniqueWithoutGuildInput> =
+  z
+    .object({
+      where: z.lazy(() => QueueWhereUniqueInputSchema),
+      data: z.union([
+        z.lazy(() => QueueUpdateWithoutGuildInputSchema),
+        z.lazy(() => QueueUncheckedUpdateWithoutGuildInputSchema),
+      ]),
+    })
+    .strict();
+
+export const QueueUpdateManyWithWhereWithoutGuildInputSchema: z.ZodType<Prisma.QueueUpdateManyWithWhereWithoutGuildInput> =
+  z
+    .object({
+      where: z.lazy(() => QueueScalarWhereInputSchema),
+      data: z.union([
+        z.lazy(() => QueueUpdateManyMutationInputSchema),
+        z.lazy(() => QueueUncheckedUpdateManyWithoutGuildInputSchema),
+      ]),
+    })
+    .strict();
+
+export const QueueScalarWhereInputSchema: z.ZodType<Prisma.QueueScalarWhereInput> =
+  z
+    .object({
+      AND: z
+        .union([
+          z.lazy(() => QueueScalarWhereInputSchema),
+          z.lazy(() => QueueScalarWhereInputSchema).array(),
+        ])
+        .optional(),
+      OR: z
+        .lazy(() => QueueScalarWhereInputSchema)
+        .array()
+        .optional(),
+      NOT: z
+        .union([
+          z.lazy(() => QueueScalarWhereInputSchema),
+          z.lazy(() => QueueScalarWhereInputSchema).array(),
+        ])
+        .optional(),
+      id: z.union([z.lazy(() => StringFilterSchema), z.string()]).optional(),
+      guildId: z
+        .union([z.lazy(() => StringFilterSchema), z.string()])
+        .optional(),
+      requestId: z
+        .union([z.lazy(() => StringFilterSchema), z.string()])
+        .optional(),
+      order: z.union([z.lazy(() => IntFilterSchema), z.number()]).optional(),
+      createdAt: z
+        .union([z.lazy(() => DateTimeFilterSchema), z.coerce.date()])
+        .optional(),
+      updatedAt: z
+        .union([z.lazy(() => DateTimeFilterSchema), z.coerce.date()])
+        .optional(),
+    })
+    .strict();
+
 export const GuildCreateWithoutSettingInputSchema: z.ZodType<Prisma.GuildCreateWithoutSettingInput> =
   z
     .object({
@@ -5006,6 +6333,9 @@ export const GuildCreateWithoutSettingInputSchema: z.ZodType<Prisma.GuildCreateW
       updatedAt: z.coerce.date().optional(),
       Request: z
         .lazy(() => RequestCreateNestedManyWithoutGuildInputSchema)
+        .optional(),
+      Queue: z
+        .lazy(() => QueueCreateNestedManyWithoutGuildInputSchema)
         .optional(),
     })
     .strict();
@@ -5019,6 +6349,9 @@ export const GuildUncheckedCreateWithoutSettingInputSchema: z.ZodType<Prisma.Gui
       updatedAt: z.coerce.date().optional(),
       Request: z
         .lazy(() => RequestUncheckedCreateNestedManyWithoutGuildInputSchema)
+        .optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedCreateNestedManyWithoutGuildInputSchema)
         .optional(),
     })
     .strict();
@@ -5090,6 +6423,9 @@ export const GuildUpdateWithoutSettingInputSchema: z.ZodType<Prisma.GuildUpdateW
       Request: z
         .lazy(() => RequestUpdateManyWithoutGuildNestedInputSchema)
         .optional(),
+      Queue: z
+        .lazy(() => QueueUpdateManyWithoutGuildNestedInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -5122,6 +6458,9 @@ export const GuildUncheckedUpdateWithoutSettingInputSchema: z.ZodType<Prisma.Gui
         .optional(),
       Request: z
         .lazy(() => RequestUncheckedUpdateManyWithoutGuildNestedInputSchema)
+        .optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedUpdateManyWithoutGuildNestedInputSchema)
         .optional(),
     })
     .strict();
@@ -5296,6 +6635,9 @@ export const RequestCreateWithoutVideoInputSchema: z.ZodType<Prisma.RequestCreat
       updatedAt: z.coerce.date().optional(),
       guild: z.lazy(() => GuildCreateNestedOneWithoutRequestInputSchema),
       user: z.lazy(() => UserCreateNestedOneWithoutRequestInputSchema),
+      Queue: z
+        .lazy(() => QueueCreateNestedManyWithoutRequestInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -5308,6 +6650,9 @@ export const RequestUncheckedCreateWithoutVideoInputSchema: z.ZodType<Prisma.Req
       playedAt: z.coerce.date().optional().nullable(),
       createdAt: z.coerce.date().optional(),
       updatedAt: z.coerce.date().optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedCreateNestedManyWithoutRequestInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -5489,6 +6834,9 @@ export const RequestCreateWithoutUserInputSchema: z.ZodType<Prisma.RequestCreate
       updatedAt: z.coerce.date().optional(),
       guild: z.lazy(() => GuildCreateNestedOneWithoutRequestInputSchema),
       video: z.lazy(() => VideoCreateNestedOneWithoutRequestInputSchema),
+      Queue: z
+        .lazy(() => QueueCreateNestedManyWithoutRequestInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -5501,6 +6849,9 @@ export const RequestUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.Requ
       playedAt: z.coerce.date().optional().nullable(),
       createdAt: z.coerce.date().optional(),
       updatedAt: z.coerce.date().optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedCreateNestedManyWithoutRequestInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -5573,6 +6924,9 @@ export const GuildCreateWithoutRequestInputSchema: z.ZodType<Prisma.GuildCreateW
       Setting: z
         .lazy(() => SettingCreateNestedOneWithoutGuildInputSchema)
         .optional(),
+      Queue: z
+        .lazy(() => QueueCreateNestedManyWithoutGuildInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -5585,6 +6939,9 @@ export const GuildUncheckedCreateWithoutRequestInputSchema: z.ZodType<Prisma.Gui
       updatedAt: z.coerce.date().optional(),
       Setting: z
         .lazy(() => SettingUncheckedCreateNestedOneWithoutGuildInputSchema)
+        .optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedCreateNestedManyWithoutGuildInputSchema)
         .optional(),
     })
     .strict();
@@ -5668,6 +7025,50 @@ export const VideoCreateOrConnectWithoutRequestInputSchema: z.ZodType<Prisma.Vid
     })
     .strict();
 
+export const QueueCreateWithoutRequestInputSchema: z.ZodType<Prisma.QueueCreateWithoutRequestInput> =
+  z
+    .object({
+      id: z.string().uuid().optional(),
+      order: z.number().int(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+      guild: z.lazy(() => GuildCreateNestedOneWithoutQueueInputSchema),
+    })
+    .strict();
+
+export const QueueUncheckedCreateWithoutRequestInputSchema: z.ZodType<Prisma.QueueUncheckedCreateWithoutRequestInput> =
+  z
+    .object({
+      id: z.string().uuid().optional(),
+      guildId: z.string(),
+      order: z.number().int(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+    })
+    .strict();
+
+export const QueueCreateOrConnectWithoutRequestInputSchema: z.ZodType<Prisma.QueueCreateOrConnectWithoutRequestInput> =
+  z
+    .object({
+      where: z.lazy(() => QueueWhereUniqueInputSchema),
+      create: z.union([
+        z.lazy(() => QueueCreateWithoutRequestInputSchema),
+        z.lazy(() => QueueUncheckedCreateWithoutRequestInputSchema),
+      ]),
+    })
+    .strict();
+
+export const QueueCreateManyRequestInputEnvelopeSchema: z.ZodType<Prisma.QueueCreateManyRequestInputEnvelope> =
+  z
+    .object({
+      data: z.union([
+        z.lazy(() => QueueCreateManyRequestInputSchema),
+        z.lazy(() => QueueCreateManyRequestInputSchema).array(),
+      ]),
+      skipDuplicates: z.boolean().optional(),
+    })
+    .strict();
+
 export const GuildUpsertWithoutRequestInputSchema: z.ZodType<Prisma.GuildUpsertWithoutRequestInput> =
   z
     .object({
@@ -5724,6 +7125,9 @@ export const GuildUpdateWithoutRequestInputSchema: z.ZodType<Prisma.GuildUpdateW
       Setting: z
         .lazy(() => SettingUpdateOneWithoutGuildNestedInputSchema)
         .optional(),
+      Queue: z
+        .lazy(() => QueueUpdateManyWithoutGuildNestedInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -5756,6 +7160,9 @@ export const GuildUncheckedUpdateWithoutRequestInputSchema: z.ZodType<Prisma.Gui
         .optional(),
       Setting: z
         .lazy(() => SettingUncheckedUpdateOneWithoutGuildNestedInputSchema)
+        .optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedUpdateManyWithoutGuildNestedInputSchema)
         .optional(),
     })
     .strict();
@@ -5965,6 +7372,336 @@ export const VideoUncheckedUpdateWithoutRequestInputSchema: z.ZodType<Prisma.Vid
     })
     .strict();
 
+export const QueueUpsertWithWhereUniqueWithoutRequestInputSchema: z.ZodType<Prisma.QueueUpsertWithWhereUniqueWithoutRequestInput> =
+  z
+    .object({
+      where: z.lazy(() => QueueWhereUniqueInputSchema),
+      update: z.union([
+        z.lazy(() => QueueUpdateWithoutRequestInputSchema),
+        z.lazy(() => QueueUncheckedUpdateWithoutRequestInputSchema),
+      ]),
+      create: z.union([
+        z.lazy(() => QueueCreateWithoutRequestInputSchema),
+        z.lazy(() => QueueUncheckedCreateWithoutRequestInputSchema),
+      ]),
+    })
+    .strict();
+
+export const QueueUpdateWithWhereUniqueWithoutRequestInputSchema: z.ZodType<Prisma.QueueUpdateWithWhereUniqueWithoutRequestInput> =
+  z
+    .object({
+      where: z.lazy(() => QueueWhereUniqueInputSchema),
+      data: z.union([
+        z.lazy(() => QueueUpdateWithoutRequestInputSchema),
+        z.lazy(() => QueueUncheckedUpdateWithoutRequestInputSchema),
+      ]),
+    })
+    .strict();
+
+export const QueueUpdateManyWithWhereWithoutRequestInputSchema: z.ZodType<Prisma.QueueUpdateManyWithWhereWithoutRequestInput> =
+  z
+    .object({
+      where: z.lazy(() => QueueScalarWhereInputSchema),
+      data: z.union([
+        z.lazy(() => QueueUpdateManyMutationInputSchema),
+        z.lazy(() => QueueUncheckedUpdateManyWithoutRequestInputSchema),
+      ]),
+    })
+    .strict();
+
+export const GuildCreateWithoutQueueInputSchema: z.ZodType<Prisma.GuildCreateWithoutQueueInput> =
+  z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+      Setting: z
+        .lazy(() => SettingCreateNestedOneWithoutGuildInputSchema)
+        .optional(),
+      Request: z
+        .lazy(() => RequestCreateNestedManyWithoutGuildInputSchema)
+        .optional(),
+    })
+    .strict();
+
+export const GuildUncheckedCreateWithoutQueueInputSchema: z.ZodType<Prisma.GuildUncheckedCreateWithoutQueueInput> =
+  z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+      Setting: z
+        .lazy(() => SettingUncheckedCreateNestedOneWithoutGuildInputSchema)
+        .optional(),
+      Request: z
+        .lazy(() => RequestUncheckedCreateNestedManyWithoutGuildInputSchema)
+        .optional(),
+    })
+    .strict();
+
+export const GuildCreateOrConnectWithoutQueueInputSchema: z.ZodType<Prisma.GuildCreateOrConnectWithoutQueueInput> =
+  z
+    .object({
+      where: z.lazy(() => GuildWhereUniqueInputSchema),
+      create: z.union([
+        z.lazy(() => GuildCreateWithoutQueueInputSchema),
+        z.lazy(() => GuildUncheckedCreateWithoutQueueInputSchema),
+      ]),
+    })
+    .strict();
+
+export const RequestCreateWithoutQueueInputSchema: z.ZodType<Prisma.RequestCreateWithoutQueueInput> =
+  z
+    .object({
+      id: z.string().uuid().optional(),
+      playedAt: z.coerce.date().optional().nullable(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+      guild: z.lazy(() => GuildCreateNestedOneWithoutRequestInputSchema),
+      user: z.lazy(() => UserCreateNestedOneWithoutRequestInputSchema),
+      video: z.lazy(() => VideoCreateNestedOneWithoutRequestInputSchema),
+    })
+    .strict();
+
+export const RequestUncheckedCreateWithoutQueueInputSchema: z.ZodType<Prisma.RequestUncheckedCreateWithoutQueueInput> =
+  z
+    .object({
+      id: z.string().uuid().optional(),
+      guildId: z.string(),
+      userId: z.string(),
+      videoId: z.string(),
+      playedAt: z.coerce.date().optional().nullable(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+    })
+    .strict();
+
+export const RequestCreateOrConnectWithoutQueueInputSchema: z.ZodType<Prisma.RequestCreateOrConnectWithoutQueueInput> =
+  z
+    .object({
+      where: z.lazy(() => RequestWhereUniqueInputSchema),
+      create: z.union([
+        z.lazy(() => RequestCreateWithoutQueueInputSchema),
+        z.lazy(() => RequestUncheckedCreateWithoutQueueInputSchema),
+      ]),
+    })
+    .strict();
+
+export const GuildUpsertWithoutQueueInputSchema: z.ZodType<Prisma.GuildUpsertWithoutQueueInput> =
+  z
+    .object({
+      update: z.union([
+        z.lazy(() => GuildUpdateWithoutQueueInputSchema),
+        z.lazy(() => GuildUncheckedUpdateWithoutQueueInputSchema),
+      ]),
+      create: z.union([
+        z.lazy(() => GuildCreateWithoutQueueInputSchema),
+        z.lazy(() => GuildUncheckedCreateWithoutQueueInputSchema),
+      ]),
+      where: z.lazy(() => GuildWhereInputSchema).optional(),
+    })
+    .strict();
+
+export const GuildUpdateToOneWithWhereWithoutQueueInputSchema: z.ZodType<Prisma.GuildUpdateToOneWithWhereWithoutQueueInput> =
+  z
+    .object({
+      where: z.lazy(() => GuildWhereInputSchema).optional(),
+      data: z.union([
+        z.lazy(() => GuildUpdateWithoutQueueInputSchema),
+        z.lazy(() => GuildUncheckedUpdateWithoutQueueInputSchema),
+      ]),
+    })
+    .strict();
+
+export const GuildUpdateWithoutQueueInputSchema: z.ZodType<Prisma.GuildUpdateWithoutQueueInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      name: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      Setting: z
+        .lazy(() => SettingUpdateOneWithoutGuildNestedInputSchema)
+        .optional(),
+      Request: z
+        .lazy(() => RequestUpdateManyWithoutGuildNestedInputSchema)
+        .optional(),
+    })
+    .strict();
+
+export const GuildUncheckedUpdateWithoutQueueInputSchema: z.ZodType<Prisma.GuildUncheckedUpdateWithoutQueueInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      name: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      Setting: z
+        .lazy(() => SettingUncheckedUpdateOneWithoutGuildNestedInputSchema)
+        .optional(),
+      Request: z
+        .lazy(() => RequestUncheckedUpdateManyWithoutGuildNestedInputSchema)
+        .optional(),
+    })
+    .strict();
+
+export const RequestUpsertWithoutQueueInputSchema: z.ZodType<Prisma.RequestUpsertWithoutQueueInput> =
+  z
+    .object({
+      update: z.union([
+        z.lazy(() => RequestUpdateWithoutQueueInputSchema),
+        z.lazy(() => RequestUncheckedUpdateWithoutQueueInputSchema),
+      ]),
+      create: z.union([
+        z.lazy(() => RequestCreateWithoutQueueInputSchema),
+        z.lazy(() => RequestUncheckedCreateWithoutQueueInputSchema),
+      ]),
+      where: z.lazy(() => RequestWhereInputSchema).optional(),
+    })
+    .strict();
+
+export const RequestUpdateToOneWithWhereWithoutQueueInputSchema: z.ZodType<Prisma.RequestUpdateToOneWithWhereWithoutQueueInput> =
+  z
+    .object({
+      where: z.lazy(() => RequestWhereInputSchema).optional(),
+      data: z.union([
+        z.lazy(() => RequestUpdateWithoutQueueInputSchema),
+        z.lazy(() => RequestUncheckedUpdateWithoutQueueInputSchema),
+      ]),
+    })
+    .strict();
+
+export const RequestUpdateWithoutQueueInputSchema: z.ZodType<Prisma.RequestUpdateWithoutQueueInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      playedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional()
+        .nullable(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      guild: z
+        .lazy(() => GuildUpdateOneRequiredWithoutRequestNestedInputSchema)
+        .optional(),
+      user: z
+        .lazy(() => UserUpdateOneRequiredWithoutRequestNestedInputSchema)
+        .optional(),
+      video: z
+        .lazy(() => VideoUpdateOneRequiredWithoutRequestNestedInputSchema)
+        .optional(),
+    })
+    .strict();
+
+export const RequestUncheckedUpdateWithoutQueueInputSchema: z.ZodType<Prisma.RequestUncheckedUpdateWithoutQueueInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      guildId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      userId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      videoId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      playedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional()
+        .nullable(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+    })
+    .strict();
+
 export const RequestCreateManyGuildInputSchema: z.ZodType<Prisma.RequestCreateManyGuildInput> =
   z
     .object({
@@ -5972,6 +7709,17 @@ export const RequestCreateManyGuildInputSchema: z.ZodType<Prisma.RequestCreateMa
       userId: z.string(),
       videoId: z.string(),
       playedAt: z.coerce.date().optional().nullable(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+    })
+    .strict();
+
+export const QueueCreateManyGuildInputSchema: z.ZodType<Prisma.QueueCreateManyGuildInput> =
+  z
+    .object({
+      id: z.string().uuid().optional(),
+      requestId: z.string(),
+      order: z.number().int(),
       createdAt: z.coerce.date().optional(),
       updatedAt: z.coerce.date().optional(),
     })
@@ -6010,6 +7758,9 @@ export const RequestUpdateWithoutGuildInputSchema: z.ZodType<Prisma.RequestUpdat
         .optional(),
       video: z
         .lazy(() => VideoUpdateOneRequiredWithoutRequestNestedInputSchema)
+        .optional(),
+      Queue: z
+        .lazy(() => QueueUpdateManyWithoutRequestNestedInputSchema)
         .optional(),
     })
     .strict();
@@ -6054,6 +7805,9 @@ export const RequestUncheckedUpdateWithoutGuildInputSchema: z.ZodType<Prisma.Req
           z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
         ])
         .optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedUpdateManyWithoutRequestNestedInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -6085,6 +7839,111 @@ export const RequestUncheckedUpdateManyWithoutGuildInputSchema: z.ZodType<Prisma
         ])
         .optional()
         .nullable(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueUpdateWithoutGuildInputSchema: z.ZodType<Prisma.QueueUpdateWithoutGuildInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      order: z
+        .union([
+          z.number().int(),
+          z.lazy(() => IntFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      request: z
+        .lazy(() => RequestUpdateOneRequiredWithoutQueueNestedInputSchema)
+        .optional(),
+    })
+    .strict();
+
+export const QueueUncheckedUpdateWithoutGuildInputSchema: z.ZodType<Prisma.QueueUncheckedUpdateWithoutGuildInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      requestId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      order: z
+        .union([
+          z.number().int(),
+          z.lazy(() => IntFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueUncheckedUpdateManyWithoutGuildInputSchema: z.ZodType<Prisma.QueueUncheckedUpdateManyWithoutGuildInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      requestId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      order: z
+        .union([
+          z.number().int(),
+          z.lazy(() => IntFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
       createdAt: z
         .union([
           z.coerce.date(),
@@ -6290,6 +8149,9 @@ export const RequestUpdateWithoutVideoInputSchema: z.ZodType<Prisma.RequestUpdat
       user: z
         .lazy(() => UserUpdateOneRequiredWithoutRequestNestedInputSchema)
         .optional(),
+      Queue: z
+        .lazy(() => QueueUpdateManyWithoutRequestNestedInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -6332,6 +8194,9 @@ export const RequestUncheckedUpdateWithoutVideoInputSchema: z.ZodType<Prisma.Req
           z.coerce.date(),
           z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
         ])
+        .optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedUpdateManyWithoutRequestNestedInputSchema)
         .optional(),
     })
     .strict();
@@ -6425,6 +8290,9 @@ export const RequestUpdateWithoutUserInputSchema: z.ZodType<Prisma.RequestUpdate
       video: z
         .lazy(() => VideoUpdateOneRequiredWithoutRequestNestedInputSchema)
         .optional(),
+      Queue: z
+        .lazy(() => QueueUpdateManyWithoutRequestNestedInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -6468,6 +8336,9 @@ export const RequestUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.Requ
           z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
         ])
         .optional(),
+      Queue: z
+        .lazy(() => QueueUncheckedUpdateManyWithoutRequestNestedInputSchema)
+        .optional(),
     })
     .strict();
 
@@ -6499,6 +8370,122 @@ export const RequestUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma.
         ])
         .optional()
         .nullable(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueCreateManyRequestInputSchema: z.ZodType<Prisma.QueueCreateManyRequestInput> =
+  z
+    .object({
+      id: z.string().uuid().optional(),
+      guildId: z.string(),
+      order: z.number().int(),
+      createdAt: z.coerce.date().optional(),
+      updatedAt: z.coerce.date().optional(),
+    })
+    .strict();
+
+export const QueueUpdateWithoutRequestInputSchema: z.ZodType<Prisma.QueueUpdateWithoutRequestInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      order: z
+        .union([
+          z.number().int(),
+          z.lazy(() => IntFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      guild: z
+        .lazy(() => GuildUpdateOneRequiredWithoutQueueNestedInputSchema)
+        .optional(),
+    })
+    .strict();
+
+export const QueueUncheckedUpdateWithoutRequestInputSchema: z.ZodType<Prisma.QueueUncheckedUpdateWithoutRequestInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      guildId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      order: z
+        .union([
+          z.number().int(),
+          z.lazy(() => IntFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      createdAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      updatedAt: z
+        .union([
+          z.coerce.date(),
+          z.lazy(() => DateTimeFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+    })
+    .strict();
+
+export const QueueUncheckedUpdateManyWithoutRequestInputSchema: z.ZodType<Prisma.QueueUncheckedUpdateManyWithoutRequestInput> =
+  z
+    .object({
+      id: z
+        .union([
+          z.string().uuid(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      guildId: z
+        .union([
+          z.string(),
+          z.lazy(() => StringFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
+      order: z
+        .union([
+          z.number().int(),
+          z.lazy(() => IntFieldUpdateOperationsInputSchema),
+        ])
+        .optional(),
       createdAt: z
         .union([
           z.coerce.date(),
@@ -7213,6 +9200,116 @@ export const RequestFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.RequestFindUni
     })
     .strict();
 
+export const QueueFindFirstArgsSchema: z.ZodType<Prisma.QueueFindFirstArgs> = z
+  .object({
+    select: QueueSelectSchema.optional(),
+    include: QueueIncludeSchema.optional(),
+    where: QueueWhereInputSchema.optional(),
+    orderBy: z
+      .union([
+        QueueOrderByWithRelationInputSchema.array(),
+        QueueOrderByWithRelationInputSchema,
+      ])
+      .optional(),
+    cursor: QueueWhereUniqueInputSchema.optional(),
+    take: z.number().optional(),
+    skip: z.number().optional(),
+    distinct: z
+      .union([QueueScalarFieldEnumSchema, QueueScalarFieldEnumSchema.array()])
+      .optional(),
+  })
+  .strict();
+
+export const QueueFindFirstOrThrowArgsSchema: z.ZodType<Prisma.QueueFindFirstOrThrowArgs> =
+  z
+    .object({
+      select: QueueSelectSchema.optional(),
+      include: QueueIncludeSchema.optional(),
+      where: QueueWhereInputSchema.optional(),
+      orderBy: z
+        .union([
+          QueueOrderByWithRelationInputSchema.array(),
+          QueueOrderByWithRelationInputSchema,
+        ])
+        .optional(),
+      cursor: QueueWhereUniqueInputSchema.optional(),
+      take: z.number().optional(),
+      skip: z.number().optional(),
+      distinct: z
+        .union([QueueScalarFieldEnumSchema, QueueScalarFieldEnumSchema.array()])
+        .optional(),
+    })
+    .strict();
+
+export const QueueFindManyArgsSchema: z.ZodType<Prisma.QueueFindManyArgs> = z
+  .object({
+    select: QueueSelectSchema.optional(),
+    include: QueueIncludeSchema.optional(),
+    where: QueueWhereInputSchema.optional(),
+    orderBy: z
+      .union([
+        QueueOrderByWithRelationInputSchema.array(),
+        QueueOrderByWithRelationInputSchema,
+      ])
+      .optional(),
+    cursor: QueueWhereUniqueInputSchema.optional(),
+    take: z.number().optional(),
+    skip: z.number().optional(),
+    distinct: z
+      .union([QueueScalarFieldEnumSchema, QueueScalarFieldEnumSchema.array()])
+      .optional(),
+  })
+  .strict();
+
+export const QueueAggregateArgsSchema: z.ZodType<Prisma.QueueAggregateArgs> = z
+  .object({
+    where: QueueWhereInputSchema.optional(),
+    orderBy: z
+      .union([
+        QueueOrderByWithRelationInputSchema.array(),
+        QueueOrderByWithRelationInputSchema,
+      ])
+      .optional(),
+    cursor: QueueWhereUniqueInputSchema.optional(),
+    take: z.number().optional(),
+    skip: z.number().optional(),
+  })
+  .strict();
+
+export const QueueGroupByArgsSchema: z.ZodType<Prisma.QueueGroupByArgs> = z
+  .object({
+    where: QueueWhereInputSchema.optional(),
+    orderBy: z
+      .union([
+        QueueOrderByWithAggregationInputSchema.array(),
+        QueueOrderByWithAggregationInputSchema,
+      ])
+      .optional(),
+    by: QueueScalarFieldEnumSchema.array(),
+    having: QueueScalarWhereWithAggregatesInputSchema.optional(),
+    take: z.number().optional(),
+    skip: z.number().optional(),
+  })
+  .strict();
+
+export const QueueFindUniqueArgsSchema: z.ZodType<Prisma.QueueFindUniqueArgs> =
+  z
+    .object({
+      select: QueueSelectSchema.optional(),
+      include: QueueIncludeSchema.optional(),
+      where: QueueWhereUniqueInputSchema,
+    })
+    .strict();
+
+export const QueueFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.QueueFindUniqueOrThrowArgs> =
+  z
+    .object({
+      select: QueueSelectSchema.optional(),
+      include: QueueIncludeSchema.optional(),
+      where: QueueWhereUniqueInputSchema,
+    })
+    .strict();
+
 export const GuildCreateArgsSchema: z.ZodType<Prisma.GuildCreateArgs> = z
   .object({
     select: GuildSelectSchema.optional(),
@@ -7627,5 +9724,69 @@ export const RequestDeleteManyArgsSchema: z.ZodType<Prisma.RequestDeleteManyArgs
   z
     .object({
       where: RequestWhereInputSchema.optional(),
+    })
+    .strict();
+
+export const QueueCreateArgsSchema: z.ZodType<Prisma.QueueCreateArgs> = z
+  .object({
+    select: QueueSelectSchema.optional(),
+    include: QueueIncludeSchema.optional(),
+    data: z.union([QueueCreateInputSchema, QueueUncheckedCreateInputSchema]),
+  })
+  .strict();
+
+export const QueueUpsertArgsSchema: z.ZodType<Prisma.QueueUpsertArgs> = z
+  .object({
+    select: QueueSelectSchema.optional(),
+    include: QueueIncludeSchema.optional(),
+    where: QueueWhereUniqueInputSchema,
+    create: z.union([QueueCreateInputSchema, QueueUncheckedCreateInputSchema]),
+    update: z.union([QueueUpdateInputSchema, QueueUncheckedUpdateInputSchema]),
+  })
+  .strict();
+
+export const QueueCreateManyArgsSchema: z.ZodType<Prisma.QueueCreateManyArgs> =
+  z
+    .object({
+      data: z.union([
+        QueueCreateManyInputSchema,
+        QueueCreateManyInputSchema.array(),
+      ]),
+      skipDuplicates: z.boolean().optional(),
+    })
+    .strict();
+
+export const QueueDeleteArgsSchema: z.ZodType<Prisma.QueueDeleteArgs> = z
+  .object({
+    select: QueueSelectSchema.optional(),
+    include: QueueIncludeSchema.optional(),
+    where: QueueWhereUniqueInputSchema,
+  })
+  .strict();
+
+export const QueueUpdateArgsSchema: z.ZodType<Prisma.QueueUpdateArgs> = z
+  .object({
+    select: QueueSelectSchema.optional(),
+    include: QueueIncludeSchema.optional(),
+    data: z.union([QueueUpdateInputSchema, QueueUncheckedUpdateInputSchema]),
+    where: QueueWhereUniqueInputSchema,
+  })
+  .strict();
+
+export const QueueUpdateManyArgsSchema: z.ZodType<Prisma.QueueUpdateManyArgs> =
+  z
+    .object({
+      data: z.union([
+        QueueUpdateManyMutationInputSchema,
+        QueueUncheckedUpdateManyInputSchema,
+      ]),
+      where: QueueWhereInputSchema.optional(),
+    })
+    .strict();
+
+export const QueueDeleteManyArgsSchema: z.ZodType<Prisma.QueueDeleteManyArgs> =
+  z
+    .object({
+      where: QueueWhereInputSchema.optional(),
     })
     .strict();

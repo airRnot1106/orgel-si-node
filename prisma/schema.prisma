@@ -29,6 +29,7 @@ model Guild {
   updatedAt DateTime  @updatedAt @map("updated_at")
   Setting   Setting?
   Request   Request[]
+  Queue     Queue[]
 
   @@map("guilds")
 }
@@ -95,6 +96,20 @@ model Request {
   playedAt  DateTime? @map("played_at")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
+  Queue     Queue[]
 
   @@map("requests")
+}
+
+model Queue {
+  id        String   @id @default(uuid())
+  guildId   String   @map("guild_id")
+  guild     Guild    @relation(fields: [guildId], references: [id])
+  requestId String   @map("request_id")
+  request   Request  @relation(fields: [requestId], references: [id])
+  order     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("queues")
 }

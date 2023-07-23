@@ -5,6 +5,7 @@ import type {
   VideoWithRelations,
   UserWithRelations,
   RequestWithRelations,
+  QueueWithRelations,
 } from '@/schema/generated/prisma';
 
 export type GuildFull = Pick<
@@ -53,4 +54,11 @@ export type RequestFull = Pick<
   guild: GuildFull;
   user: UserFull;
   video: VideoFull;
+};
+
+export type QueueFull = Pick<
+  QueueWithRelations,
+  'id' | 'requestId' | 'order' | 'createdAt' | 'updatedAt'
+> & {
+  request: RequestFull;
 };

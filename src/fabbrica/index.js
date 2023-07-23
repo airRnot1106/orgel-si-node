@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineRequestFactory = exports.defineUserFactory = exports.defineVideoFactory = exports.defineChannelFactory = exports.defineSettingFactory = exports.defineGuildFactory = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = exports.initialize = void 0;
+exports.defineQueueFactory = exports.defineRequestFactory = exports.defineUserFactory = exports.defineVideoFactory = exports.defineChannelFactory = exports.defineSettingFactory = exports.defineGuildFactory = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = exports.initialize = void 0;
 const internal_1 = require("@quramy/prisma-fabbrica/lib/internal");
 var internal_2 = require("@quramy/prisma-fabbrica/lib/internal");
 Object.defineProperty(exports, "initialize", { enumerable: true, get: function () { return internal_2.initialize; } });
@@ -17,6 +17,10 @@ const modelFieldDefinitions = [{
                 name: "Request",
                 type: "Request",
                 relationName: "GuildToRequest"
+            }, {
+                name: "Queue",
+                type: "Queue",
+                relationName: "GuildToQueue"
             }]
     }, {
         name: "Setting",
@@ -64,6 +68,21 @@ const modelFieldDefinitions = [{
                 name: "video",
                 type: "Video",
                 relationName: "RequestToVideo"
+            }, {
+                name: "Queue",
+                type: "Queue",
+                relationName: "QueueToRequest"
+            }]
+    }, {
+        name: "Queue",
+        fields: [{
+                name: "guild",
+                type: "Guild",
+                relationName: "GuildToQueue"
+            }, {
+                name: "request",
+                type: "Request",
+                relationName: "QueueToRequest"
             }]
     }];
 function isGuildSettingFactory(x) {
@@ -512,3 +531,83 @@ function defineRequestFactory(options) {
     return defineRequestFactoryInternal(options);
 }
 exports.defineRequestFactory = defineRequestFactory;
+function isQueueguildFactory(x) {
+    return x?._factoryFor === "Guild";
+}
+function isQueuerequestFactory(x) {
+    return x?._factoryFor === "Request";
+}
+function autoGenerateQueueScalarsOrEnums({ seq }) {
+    return {
+        order: (0, internal_1.getScalarFieldValueGenerator)().Int({ modelName: "Queue", fieldName: "order", isId: false, isUnique: false, seq })
+    };
+}
+function defineQueueFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+    const getFactoryWithTraits = (traitKeys = []) => {
+        const seqKey = {};
+        const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
+        const screen = (0, internal_1.createScreener)("Queue", modelFieldDefinitions);
+        const build = async (inputData = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateQueueScalarsOrEnums({ seq });
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {
+                guild: isQueueguildFactory(defaultData.guild) ? {
+                    create: await defaultData.guild.build()
+                } : defaultData.guild,
+                request: isQueuerequestFactory(defaultData.request) ? {
+                    create: await defaultData.request.build()
+                } : defaultData.request
+            };
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
+        };
+        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const pickForConnect = (inputData) => ({
+            id: inputData.id
+        });
+        const create = async (inputData = {}) => {
+            const data = await build(inputData).then(screen);
+            return await (0, internal_1.getClient)().queue.create({ data });
+        };
+        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "Queue",
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
+    };
+    const factory = getFactoryWithTraits();
+    const useTraits = (name, ...names) => {
+        return getFactoryWithTraits([name, ...names]);
+    };
+    return {
+        ...factory,
+        use: useTraits,
+    };
+}
+/**
+ * Define factory for {@link Queue} model.
+ *
+ * @param options
+ * @returns factory {@link QueueFactoryInterface}
+ */
+function defineQueueFactory(options) {
+    return defineQueueFactoryInternal(options);
+}
+exports.defineQueueFactory = defineQueueFactory;
