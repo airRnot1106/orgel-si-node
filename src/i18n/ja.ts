@@ -59,4 +59,21 @@ ${user}
     not_paused: () => '再生する動画がありません。',
     playing: () => 'すでに再生中です。',
   },
+  history: {
+    description: () => '再生履歴を表示します',
+    content: ({ requests }) =>
+      `
+:notebook_with_decorative_cover: **再生履歴**
+${requests
+  .map(({ title, user }, index) => `${index + 1}. ${title} - ${user}`)
+  .join('\n')}
+`,
+    options: {
+      limit: {
+        description: () => '表示する件数を指定します',
+        invalid: () =>
+          '無効なオプションです。有効なオプションを入力してください。',
+      },
+    },
+  },
 } as const satisfies IMessage;

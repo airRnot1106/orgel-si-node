@@ -53,6 +53,16 @@ export interface IMessage {
     not_paused: () => string;
     playing: () => string;
   };
+  history: {
+    description: () => string;
+    content: (args: { requests: { title: string; user: string }[] }) => string;
+    options: {
+      limit: {
+        description: () => string;
+        invalid: () => string;
+      };
+    };
+  };
 }
 
 const messages = {

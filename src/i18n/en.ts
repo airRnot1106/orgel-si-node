@@ -58,4 +58,20 @@ ${user}
     not_paused: () => 'There is no video to play.',
     playing: () => 'Already playing.',
   },
+  history: {
+    description: () => 'Show the history of played videos',
+    content: ({ requests }) =>
+      `
+:notebook_with_decorative_cover: **Playback History**
+    ${requests
+      .map(({ title, user }, index) => `${index + 1}. ${title} - ${user}`)
+      .join('\n')}
+`,
+    options: {
+      limit: {
+        description: () => 'Number of histories to display',
+        invalid: () => 'Invalid option. Please enter a valid option.',
+      },
+    },
+  },
 } as const satisfies IMessage;

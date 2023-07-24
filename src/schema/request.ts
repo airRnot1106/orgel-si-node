@@ -49,6 +49,6 @@ export type UpdateRequestPlayedAtArgs = z.infer<
 
 export const getPlayedRequestArgsSchema = z.object({
   guildId: z.string(),
-} satisfies Partial<Record<keyof RequestFull, unknown>>);
+});
 
 export type GetPlayedRequestArgs = z.infer<typeof getPlayedRequestArgsSchema>;
