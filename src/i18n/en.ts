@@ -50,4 +50,9 @@ ${user}
       },
     },
   },
+  resume: {
+    description: () => 'Resume playback',
+    not_paused: () => 'There is no video to play.',
+    playing: () => 'Already playing.',
+  },
 } as const satisfies IMessage;

@@ -51,4 +51,9 @@ ${user}
       },
     },
   },
+  resume: {
+    description: () => '再生を再開します',
+    not_paused: () => '再生する動画がありません。',
+    playing: () => 'すでに再生中です。',
+  },
 } as const satisfies IMessage;

@@ -45,6 +45,11 @@ export interface IMessage {
       };
     };
   };
+  resume: {
+    description: () => string;
+    not_paused: () => string;
+    playing: () => string;
+  };
 }
 
 const messages = {
