@@ -2,7 +2,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "build": "tsx scripts/build.ts production",
+    "build": "tsx scripts/build.ts development",
     "build:dev": "tsx scripts/build.ts development",
     "lint": "eslint --ext .ts,.tsx src",
     "format": "prettier --write .",
