@@ -6,6 +6,9 @@ import ja from '@/i18n/ja';
 export interface IMessage {
   common: {
     internal_server_error: () => string;
+    voice_channel: {
+      not_joined: () => string;
+    };
   };
   hello: {
     description: () => string;

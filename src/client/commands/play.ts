@@ -1,10 +1,13 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { joinVoiceChannel } from '@discordjs/voice';
+import { GuildMember } from 'discord.js';
 import ytdl from 'ytdl-core';
 
 import type { SlashCommand } from '@/types/command';
 
 import { I18n } from '@/i18n';
 import { hc } from '@/libs/apiClient';
+import { play } from '@/libs/player';
 import { VideoSchema } from '@/schema/generated/prisma';
 import { DEFAULT_LOCALE, convertLocaleToLanguage } from '@/utils/locale';
 
@@ -75,6 +78,25 @@ export default {
     }
 
     const { language } = languageResponse.data;
+
+    const { member } = interaction;
+    if (!(member instanceof GuildMember)) {
+      await interaction.reply({
+        content: I18n.t(language).common.internal_server_error(),
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const voiceChannel = member.voice.channel;
+
+    if (!voiceChannel) {
+      await interaction.reply({
+        content: I18n.t(language).common.voice_channel.not_joined(),
+        ephemeral: true,
+      });
+      return;
+    }
 
     const maybeVideoUrl = interaction.options.get('video_url')?.value;
     const parseVideoUrlResult = VideoSchema.shape.url.safeParse(maybeVideoUrl);
@@ -216,5 +238,15 @@ export default {
       content: I18n.t(language).play.contents.push({ title: videoTitle }),
       ephemeral: true,
     });
+
+    const connection = joinVoiceChannel({
+      adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+      channelId: voiceChannel.id,
+      guildId,
+      selfDeaf: true,
+      selfMute: false,
+    });
+
+    await play(guildId, connection, voiceChannel);
   },
 } as const satisfies SlashCommand;

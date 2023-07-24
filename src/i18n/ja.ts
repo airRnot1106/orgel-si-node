@@ -3,6 +3,9 @@ import type { IMessage } from '@/i18n/index';
 export default {
   common: {
     internal_server_error: () => ':warning:致命的なエラーが発生しました。',
+    voice_channel: {
+      not_joined: () => '先にボイスチャンネルに参加してください。',
+    },
   },
   hello: {
     description: () => 'こんにちは、Orgel',

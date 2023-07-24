@@ -3,6 +3,9 @@ import type { IMessage } from '@/i18n/index';
 export default {
   common: {
     internal_server_error: () => ':warning:Internal Server Error.',
+    voice_channel: {
+      not_joined: () => 'Please join the voice channel first.',
+    },
   },
   hello: {
     description: () => 'Hello Orgel',
