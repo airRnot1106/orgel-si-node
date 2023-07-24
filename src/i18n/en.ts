@@ -50,6 +50,9 @@ ${user}
       },
     },
   },
+  skip: {
+    description: () => 'Skip the currently playing video',
+  },
   resume: {
     description: () => 'Resume playback',
     not_paused: () => 'There is no video to play.',

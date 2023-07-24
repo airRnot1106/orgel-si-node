@@ -45,6 +45,9 @@ export interface IMessage {
       };
     };
   };
+  skip: {
+    description: () => string;
+  };
   resume: {
     description: () => string;
     not_paused: () => string;
