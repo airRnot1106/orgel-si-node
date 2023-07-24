@@ -1,12 +1,56 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 
-import { decreaseQueueOrder, pushQueue } from '@/libs/api/queue';
-import { guildQueueParamSchema, postQueueBodySchema } from '@/schema/queue';
+import { decreaseQueueOrder, getQueue, pushQueue } from '@/libs/api/queue';
+import {
+  getQueueQuerySchema,
+  guildQueueParamSchema,
+  postQueueBodySchema,
+} from '@/schema/queue';
 
 export const queue = new Hono()
+  .get(
+    '/:guildId',
+    zValidator('param', guildQueueParamSchema, (result, c) => {
+      if (!result.success) {
+        return c.json(
+          {
+            error: {
+              message: result.error,
+            },
+          },
+          400
+        );
+      }
+    }),
+    zValidator('query', getQueueQuerySchema, (result, c) => {
+      if (!result.success) {
+        return c.json(
+          {
+            error: {
+              message: result.error,
+            },
+          },
+          400
+        );
+      }
+    }),
+    async (c) => {
+      const { guildId } = c.req.valid('param');
+      const { count } = c.req.valid('query');
+
+      const numberCount = Number(count);
+
+      const getQueueResponse = await getQueue({
+        guildId,
+        count: numberCount,
+      });
+
+      return c.jsonT(getQueueResponse, getQueueResponse.status);
+    }
+  )
   .post(
-    '/:guild-id',
+    '/:guildId',
     zValidator('param', guildQueueParamSchema, (result, c) => {
       if (!result.success) {
         return c.json(
@@ -44,7 +88,7 @@ export const queue = new Hono()
     }
   )
   .patch(
-    '/:guild-id/decrease-order',
+    '/:guildId/decrease-order',
     zValidator('param', guildQueueParamSchema, (result, c) => {
       if (!result.success) {
         return c.json(

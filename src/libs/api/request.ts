@@ -1,11 +1,56 @@
 import type {
   CreateRequestArgs,
+  GetRequestArgs,
   UpdateRequestPlayedAtArgs,
 } from '@/schema/request';
 import type { ApiResponse } from '@/types/api';
 import type { RequestFull } from '@/types/model';
 
 import prisma from '@/libs/prisma';
+
+export const getRequest = async ({
+  id,
+}: GetRequestArgs): Promise<ApiResponse<RequestFull>> => {
+  try {
+    const request = await prisma.request.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        guild: true,
+        user: true,
+        video: {
+          include: {
+            channel: true,
+          },
+        },
+      },
+    });
+
+    if (!request) {
+      return {
+        status: 404,
+        error: {
+          message: 'Request not found',
+        },
+      };
+    }
+
+    return {
+      status: 200,
+      data: request,
+    };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown error';
+
+    return {
+      status: 500,
+      error: {
+        message,
+      },
+    };
+  }
+};
 
 export const createRequest = async ({
   guildId,

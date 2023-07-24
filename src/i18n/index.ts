@@ -24,6 +24,24 @@ export interface IMessage {
       };
     };
   };
+  play: {
+    description: () => string;
+    contents: {
+      push: (args: { title: string }) => string;
+      interrupt: (args: { title: string }) => string;
+      play: (args: { title: string; user: string }) => string;
+    };
+    options: {
+      video_url: {
+        description: () => string;
+        invalid: () => string;
+      };
+      interrupt: {
+        description: () => string;
+        invalid: () => string;
+      };
+    };
+  };
 }
 
 const messages = {

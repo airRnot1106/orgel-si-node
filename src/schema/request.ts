@@ -24,6 +24,12 @@ export type PatchRequestPlayedAtBody = z.infer<
   typeof patchRequestPlayedAtBodySchema
 >;
 
+export const getRequestArgsSchema = z.object({
+  id: z.string(),
+} satisfies Partial<Record<keyof RequestFull, unknown>>);
+
+export type GetRequestArgs = z.infer<typeof getRequestArgsSchema>;
+
 export const createRequestArgsSchema = z.object({
   guildId: z.string(),
   userId: z.string(),

@@ -1,8 +1,63 @@
-import type { DecreaseQueueOrderArgs, PushQueueArgs } from '@/schema/queue';
+import type {
+  DecreaseQueueOrderArgs,
+  GetQueueArgs,
+  PushQueueArgs,
+} from '@/schema/queue';
 import type { ApiResponse } from '@/types/api';
 import type { QueueFull } from '@/types/model';
 
 import prisma from '@/libs/prisma';
+
+export const getQueue = async ({
+  guildId,
+  count,
+}: GetQueueArgs): Promise<ApiResponse<QueueFull[]>> => {
+  try {
+    const queueCount = await prisma.queue.count({
+      where: {
+        guildId,
+      },
+    });
+
+    const queue = await prisma.queue.findMany({
+      where: {
+        guildId,
+      },
+      take: count ?? queueCount,
+      orderBy: {
+        order: 'asc',
+      },
+      include: {
+        guild: true,
+        request: {
+          include: {
+            guild: true,
+            user: true,
+            video: {
+              include: {
+                channel: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return {
+      status: 200,
+      data: queue,
+    };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown error';
+
+    return {
+      status: 500,
+      error: {
+        message,
+      },
+    };
+  }
+};
 
 export const pushQueue = async ({
   guildId,
@@ -117,6 +172,15 @@ export const decreaseQueueOrder = async ({
       data: {
         order: {
           decrement: 1,
+        },
+      },
+    });
+
+    await prisma.queue.deleteMany({
+      where: {
+        guildId,
+        order: {
+          lt: 0,
         },
       },
     });

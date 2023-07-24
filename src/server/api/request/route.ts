@@ -1,7 +1,11 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 
-import { createRequest, updateRequestPlayedAt } from '@/libs/api/request';
+import {
+  createRequest,
+  getRequest,
+  updateRequestPlayedAt,
+} from '@/libs/api/request';
 import {
   patchRequestPlayedAtBodySchema,
   postRequestBodySchema,
@@ -34,6 +38,28 @@ export const request = new Hono()
       });
 
       return c.jsonT(createRequestResponse, createRequestResponse.status);
+    }
+  )
+  .get(
+    '/:id',
+    zValidator('param', requestParamSchema, (result, c) => {
+      if (!result.success) {
+        return c.json(
+          {
+            error: {
+              message: result.error,
+            },
+          },
+          404
+        );
+      }
+    }),
+    async (c) => {
+      const { id } = c.req.valid('param');
+
+      const getRequestResponse = await getRequest({ id });
+
+      return c.jsonT(getRequestResponse, getRequestResponse.status);
     }
   )
   .patch(

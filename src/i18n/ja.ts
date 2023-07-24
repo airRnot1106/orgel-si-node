@@ -22,4 +22,30 @@ export default {
       },
     },
   },
+  play: {
+    description: () => '指定したURLの動画を再生します',
+    contents: {
+      push: ({ title }) => `${title}をキューに追加しました。`,
+      interrupt: ({ title }) => `${title}を割り込み再生します。`,
+      play: ({ title, user }) =>
+        `
+:musical_note: Now Playing :musical_note:
+*タイトル*
+${title}
+
+${user}
+`,
+    },
+    options: {
+      video_url: {
+        description: () => 'Youtubeの動画URL',
+        invalid: () => '無効なURLです。有効なURLを入力してください。',
+      },
+      interrupt: {
+        description: () => 'キューの先頭に割り込みます',
+        invalid: () =>
+          '無効なオプションです。有効なオプションを入力してください。',
+      },
+    },
+  },
 } as const satisfies IMessage;
