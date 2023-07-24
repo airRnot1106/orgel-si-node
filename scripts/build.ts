@@ -21,6 +21,10 @@ const options: BuildOptions = {
       },
     }),
   ],
+  define: {
+    'import.meta.url': 'import_meta_url',
+  },
+  inject: [path.resolve(__dirname, '../scripts/import-meta-url.js')],
 };
 
 build(options).catch((err) => {
