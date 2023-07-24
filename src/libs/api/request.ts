@@ -1,5 +1,6 @@
 import type {
   CreateRequestArgs,
+  GetPlayedRequestArgs,
   GetRequestArgs,
   UpdateRequestPlayedAtArgs,
 } from '@/schema/request';
@@ -162,6 +163,47 @@ export const updateRequestPlayedAt = async ({
     return {
       status: 200,
       data: request,
+    };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown error';
+
+    return {
+      status: 500,
+      error: {
+        message,
+      },
+    };
+  }
+};
+
+export const getPlayedRequest = async ({
+  guildId,
+}: GetPlayedRequestArgs): Promise<ApiResponse<RequestFull[]>> => {
+  try {
+    const requests = await prisma.request.findMany({
+      where: {
+        guildId,
+        playedAt: {
+          not: null,
+        },
+      },
+      orderBy: {
+        playedAt: 'desc',
+      },
+      include: {
+        guild: true,
+        user: true,
+        video: {
+          include: {
+            channel: true,
+          },
+        },
+      },
+    });
+
+    return {
+      status: 200,
+      data: requests,
     };
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown error';

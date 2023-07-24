@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 
 import { channel } from '@/server/api/channel/route';
 import { guild } from '@/server/api/guild/route';
+import { history } from '@/server/api/history/route';
 import { queue } from '@/server/api/queue/route';
 import { request } from '@/server/api/request/route';
 import { setting } from '@/server/api/setting/route';
@@ -19,7 +20,8 @@ export const root = app
   .route('/video', video)
   .route('/user', user)
   .route('/request', request)
-  .route('/queue', queue);
+  .route('/queue', queue)
+  .route('/history', history);
 
 if (process.env.NODE_ENV !== 'test') {
   serve(root, (info) => {
