@@ -33,6 +33,8 @@ export default {
       })
     ).json();
     if (languageResponse.status !== 200) {
+      // eslint-disable-next-line no-console
+      console.error(languageResponse);
       const { locale } = interaction;
       await interaction.reply({
         content: I18n.t(
