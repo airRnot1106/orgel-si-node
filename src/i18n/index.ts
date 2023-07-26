@@ -63,6 +63,15 @@ export interface IMessage {
       };
     };
   };
+  queue: {
+    description: () => string;
+    contents: {
+      empty: () => string;
+      content: (args: {
+        requests: { title: string; user: string }[];
+      }) => string;
+    };
+  };
 }
 
 const messages = {

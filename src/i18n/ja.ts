@@ -76,4 +76,16 @@ ${requests
       },
     },
   },
+  queue: {
+    description: () => 'キューを表示します',
+    contents: {
+      empty: () => 'キューは空です。',
+      content: ({ requests }) => `
+:headphones: **キュー**
+      ${requests
+        .map(({ title, user }, index) => `${index + 1}. ${title} - ${user}`)
+        .join('\n')}
+`,
+    },
+  },
 } as const satisfies IMessage;
