@@ -217,11 +217,16 @@ export default {
 
     const { id: requestId } = createRequestResponse.data;
 
+    const isInterrupt =
+      (interaction.options.get('interrupt')?.value as boolean | undefined) ??
+      false;
+
     const pushQueueResponse = await (
       await hc.queue[':guildId'].$post({
         param: { guildId },
         json: {
           requestId,
+          isInterrupt,
         },
       })
     ).json();

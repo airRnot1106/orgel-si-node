@@ -74,4 +74,16 @@ ${user}
       },
     },
   },
+  queue: {
+    description: () => 'Show the queue of videos to play',
+    contents: {
+      empty: () => 'There are no videos in the queue.',
+      content: ({ requests }) => `
+:headphones: **Playback Queue**
+      ${requests
+        .map(({ title, user }, index) => `${index + 1}. ${title} - ${user}`)
+        .join('\n')}
+`,
+    },
+  },
 } as const satisfies IMessage;

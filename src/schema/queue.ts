@@ -14,6 +14,7 @@ export type GetQueueQuery = z.infer<typeof getQueueQuerySchema>;
 
 export const postQueueBodySchema = z.object({
   requestId: z.string(),
+  isInterrupt: z.boolean().default(false),
 });
 
 export type PostQueueBody = z.infer<typeof postQueueBodySchema>;
@@ -39,3 +40,10 @@ export const decreaseQueueOrderArgsSchema = z.object({
 export type DecreaseQueueOrderArgs = z.infer<
   typeof decreaseQueueOrderArgsSchema
 >;
+
+export const interruptQueueArgsSchema = z.object({
+  guildId: z.string(),
+  requestId: z.string(),
+});
+
+export type InterruptQueueArgs = z.infer<typeof interruptQueueArgsSchema>;
