@@ -113,6 +113,11 @@ export default {
       return;
     }
 
+    await interaction.reply({
+      content: '\u200B',
+      ephemeral: true,
+    });
+
     const connection = joinVoiceChannel({
       adapterCreator: voiceChannel.guild.voiceAdapterCreator,
       channelId: voiceChannel.id,
