@@ -1,7 +1,12 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 
-import { decreaseQueueOrder, getQueue, pushQueue } from '@/libs/api/queue';
+import {
+  decreaseQueueOrder,
+  getQueue,
+  interruptQueue,
+  pushQueue,
+} from '@/libs/api/queue';
 import {
   getQueueQuerySchema,
   guildQueueParamSchema,
@@ -77,12 +82,17 @@ export const queue = new Hono()
     }),
     async (c) => {
       const { guildId } = c.req.valid('param');
-      const { requestId } = c.req.valid('json');
+      const { requestId, isInterrupt } = c.req.valid('json');
 
-      const pushQueueResponse = await pushQueue({
-        guildId,
-        requestId,
-      });
+      const pushQueueResponse = isInterrupt
+        ? await interruptQueue({
+            guildId,
+            requestId,
+          })
+        : await pushQueue({
+            guildId,
+            requestId,
+          });
 
       return c.jsonT(pushQueueResponse, pushQueueResponse.status);
     }

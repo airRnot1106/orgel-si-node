@@ -1,6 +1,7 @@
 import type {
   DecreaseQueueOrderArgs,
   GetQueueArgs,
+  InterruptQueueArgs,
   PushQueueArgs,
 } from '@/schema/queue';
 import type { ApiResponse } from '@/types/api';
@@ -106,7 +107,7 @@ export const pushQueue = async ({
       },
     });
 
-    const order = lastOrder ? lastOrder.order + 1 : 0;
+    const order = lastOrder !== null ? lastOrder.order + 1 : 0;
 
     const queue = await prisma.queue.create({
       data: {
@@ -188,6 +189,106 @@ export const decreaseQueueOrder = async ({
     return {
       status: 200,
       data: result,
+    };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown error';
+
+    return {
+      status: 500,
+      error: {
+        message,
+      },
+    };
+  }
+};
+
+export const interruptQueue = async ({
+  guildId,
+  requestId,
+}: InterruptQueueArgs): Promise<ApiResponse<QueueFull>> => {
+  try {
+    const existsGuild = await prisma.guild.findUnique({
+      where: {
+        id: guildId,
+      },
+    });
+
+    if (!existsGuild) {
+      return {
+        status: 404,
+        error: {
+          message: 'Guild not found',
+        },
+      };
+    }
+
+    const existsRequest = await prisma.request.findUnique({
+      where: {
+        id: requestId,
+      },
+    });
+
+    if (!existsRequest) {
+      return {
+        status: 404,
+        error: {
+          message: 'Request not found',
+        },
+      };
+    }
+
+    const lastOrder = await prisma.queue.findFirst({
+      where: {
+        guildId,
+      },
+      orderBy: {
+        order: 'desc',
+      },
+      select: {
+        order: true,
+      },
+    });
+
+    const order = lastOrder !== null ? 1 : 0;
+
+    await prisma.queue.updateMany({
+      where: {
+        order: {
+          gte: 1,
+        },
+      },
+      data: {
+        order: {
+          increment: 1,
+        },
+      },
+    });
+
+    const queue = await prisma.queue.create({
+      data: {
+        guildId,
+        requestId,
+        order,
+      },
+      include: {
+        guild: true,
+        request: {
+          include: {
+            guild: true,
+            user: true,
+            video: {
+              include: {
+                channel: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return {
+      status: 200,
+      data: queue,
     };
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown error';
